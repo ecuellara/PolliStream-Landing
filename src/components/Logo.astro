@@ -1,0 +1,14 @@
+---
+interface Props {
+  href: string
+  compact?: boolean
+  class?: string
+}
+
+const { href, compact = false, class: className = '' } = Astro.props
+---
+
+<a href={href} class={`brand ${className}`} aria-label="PolliStream">
+  <img src="/brand/icon-64.png" alt="" width="38" height="38" class="brand__mark" loading="eager" decoding="async" />
+  {!compact && <span class="brand__name">Polli<span>Stream</span></span>}
+</a>

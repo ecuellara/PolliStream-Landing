@@ -1,0 +1,16 @@
+---
+import type { GetStaticPaths } from 'astro'
+import ProductPage from '../../components/ProductPage.astro'
+import { getProduct, productSlugs, type ProductMeta } from '../../data/products'
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return productSlugs.map((slug) => ({
+    params: { product: slug },
+    props: { product: getProduct(slug) },
+  }))
+}
+
+const { product } = Astro.props as { product: ProductMeta }
+---
+
+<ProductPage locale="pt" product={product} />

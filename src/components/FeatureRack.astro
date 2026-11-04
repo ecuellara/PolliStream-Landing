@@ -1,0 +1,34 @@
+---
+import type { Locale } from '../data/content/types'
+import { getContent } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+---
+
+<section class="section container-page" id="features">
+  <header class="section-head" data-reveal>
+    <p class="eyebrow">{t.features.kicker}</p>
+    <div class="section-head__row">
+      <h2 class="section-title">{t.features.title}</h2>
+      <p class="section-lead">{t.features.body}</p>
+    </div>
+  </header>
+
+  <div class="feature-rack" data-reveal>
+    {t.features.items.map((item) => (
+      <article class="feature-module">
+        <div class="feature-module__top">
+          <span class="feature-module__index">{item.index}</span>
+          <span class="feature-module__tag">{item.tag}</span>
+        </div>
+        <h3 class="feature-module__title">{item.title}</h3>
+        <p class="feature-module__body">{item.body}</p>
+      </article>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,174 @@
+---
+import Layout from './Layout.astro'
+import Hero from './Hero.astro'
+import SignalBand from './SignalBand.astro'
+import PlatformGrid from './PlatformGrid.astro'
+import FeatureRack from './FeatureRack.astro'
+import SignalFlow from './SignalFlow.astro'
+import InstallSteps from './InstallSteps.astro'
+import SupportPanels from './SupportPanels.astro'
+import Faq from './Faq.astro'
+import AdSlot from './AdSlot.astro'
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import { getContent, alternatesForHome, homePath, productPath, htmlLang } from '../lib/i18n'
+import { products } from '../data/products'
+import { site } from '../data/site'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+const alternates = alternatesForHome()
+const home = homePath(locale)
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: site.name,
+    url: `${site.url}/`,
+    logo: `${site.url}${site.icon}`,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: site.name,
+    url: `${site.url}${home}`,
+    inLanguage: htmlLang[locale],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: t.faq.items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  },
+]
+---
+
+<Layout
+  locale={locale}
+  title={t.meta.title}
+  description={t.meta.description}
+  alternates={alternates}
+  canonicalPath={home}
+  downloadHref="#platforms"
+  jsonLd={jsonLd}
+>
+  <Hero locale={locale} />
+  <SignalBand locale={locale} />
+  <PlatformGrid locale={locale} />
+  <FeatureRack locale={locale} />
+  <SignalFlow locale={locale} />
+  <div class="container-page ad-wrap">
+    <AdSlot locale={locale} slot="home-mid" />
+  </div>
+  <InstallSteps locale={locale} />
+  <SupportPanels locale={locale} />
+  <Faq locale={locale} />
+
+  <section class="section container-page final-cta" data-reveal>
+    <div class="final-cta__panel">
+      <p class="eyebrow">{t.platforms.kicker}</p>
+      <h2 class="section-title">
+        {t.hero.titleA} <span class="text-lime">{t.hero.titleB}</span>
+      </h2>
+      <p class="section-lead">{t.platforms.body}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#platforms">
+          <Icon name="download" size={15} />
+          {t.hero.primary}
+        </a>
+        <a class="btn btn-secondary" href={`${home}#features`}>
+          {t.hero.secondary}
+          <Icon name="arrow-right" size={15} class="arrow" />
+        </a>
+      </div>
+      <div class="final-platforms">
+        {products.map((product) => (
+          <a class="final-platform" href={productPath(locale, product.slug)}>
+            <Icon name={product.icon} size={16} />
+            <span>{product.name}</span>
+            <Icon name="arrow-up-right" size={12} />
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .ad-wrap {
+    padding-block: 8px 8px;
+  }
+
+  .final-cta__panel {
+    position: relative;
+    padding: clamp(1.6rem, 4vw, 3.5rem);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(80% 100% at 100% 0%, rgba(198, 255, 61, 0.12), transparent 58%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.03), transparent 50%),
+      var(--color-panel);
+    overflow: hidden;
+  }
+
+  .final-cta__panel .section-title {
+    margin-top: 18px;
+    max-width: 18ch;
+  }
+
+  .final-cta__panel .section-lead {
+    margin-top: 18px;
+  }
+
+  .final-platforms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--color-white-10);
+  }
+
+  .final-platform {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border: 1px solid var(--color-white-10);
+    border-radius: 999px;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition:
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .final-platform:hover {
+    border-color: var(--color-lime);
+    color: var(--color-lime);
+  }
+
+  @media (max-width: 640px) {
+    .final-platforms {
+      gap: 6px;
+    }
+
+    .final-platform {
+      font-size: 8px;
+    }
+  }
+</style>

@@ -1,0 +1,155 @@
+---
+import Icon from './Icon.astro'
+import AdSlot from './AdSlot.astro'
+import type { Locale } from '../data/content/types'
+import type { ProductMeta } from '../data/products'
+import { getContent, formatTemplate, platformLabel, productPath } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+  product: ProductMeta
+}
+
+const { locale, product } = Astro.props
+const t = getContent(locale)
+const copy = t.download
+const isLive = product.status === 'live'
+const isLocker = product.downloadMode === 'locker'
+const isExternal = /^https?:\/\//i.test(product.downloadUrl)
+const opensNewTab = isLocker || isExternal
+const target = opensNewTab ? '_blank' : undefined
+const rel = isLocker ? 'sponsored noopener' : 'noopener'
+const downloadAttr = !isLocker && !isExternal ? product.fileName : undefined
+const buttonLabel = isLocker
+  ? copy.lockerButton
+  : formatTemplate(copy.button, { format: product.fileType })
+const backHref = productPath(locale, product.slug)
+---
+
+<div class="download-shell">
+  <div
+    class="download-card"
+    data-download-gate
+    data-download-seconds="3"
+    data-download-ready={copy.ready}
+  >
+    <p class="eyebrow">{copy.kicker}</p>
+
+    {isLive ? (
+      <>
+        <h1 class="download-card__title">{copy.title}</h1>
+        <p class="download-card__lead">
+          {formatTemplate(copy.description, { platform: product.name })}
+        </p>
+
+        <div class="download-product">
+          <span class="download-product__icon">
+            <Icon name={product.icon} size={24} />
+          </span>
+          <div>
+            <p class="download-product__name">PolliStream · {product.name}</p>
+            <p class="download-product__meta">
+              {platformLabel(locale, product.slug)} · {product.fileType} · {product.version}
+            </p>
+          </div>
+        </div>
+
+        <div class="download-progress">
+          <div class="download-progress__row">
+            <span data-download-status>{copy.preparing}</span>
+            <span class="download-progress__value" data-download-countdown>3s</span>
+          </div>
+          <div class="download-progress__track">
+            <div class="download-progress__bar" data-download-bar></div>
+          </div>
+        </div>
+
+        <div class="download-action">
+          <a
+            class="btn btn-primary"
+            href={product.downloadUrl}
+            data-download-button
+            data-download-url={product.downloadUrl}
+            data-download-mode={product.downloadMode}
+            data-track-label={product.slug}
+            target={target}
+            rel={rel}
+            download={downloadAttr}
+          >
+            <Icon name="download" size={16} />
+            {buttonLabel}
+          </a>
+          <a class="btn btn-ghost btn-sm" href={backHref}>
+            <Icon name="arrow-left" size={14} />
+            {formatTemplate(copy.back, { platform: product.name })}
+          </a>
+        </div>
+
+        <p class="download-hint">
+          {isLocker ? copy.partnerNote : copy.adNote}
+        </p>
+
+        <dl class="download-specs">
+          <div class="download-spec">
+            <dt>{copy.file}</dt>
+            <dd>{product.fileName || '—'}</dd>
+          </div>
+          <div class="download-spec">
+            <dt>{copy.version}</dt>
+            <dd>{product.version}</dd>
+          </div>
+          <div class="download-spec">
+            <dt>{copy.size}</dt>
+            <dd>{product.size}</dd>
+          </div>
+          <div class="download-spec">
+            <dt>{copy.format}</dt>
+            <dd>{product.fileType}</dd>
+          </div>
+          {product.sha256 && (
+            <div class="download-spec" style="grid-column: 1 / -1;">
+              <dt>{copy.checksum}</dt>
+              <dd>{product.sha256}</dd>
+            </div>
+          )}
+        </dl>
+      </>
+    ) : (
+      <>
+        <h1 class="download-card__title">{copy.soonTitle}</h1>
+        <p class="download-card__lead">
+          {formatTemplate(copy.soonBody, { platform: product.name })}
+        </p>
+        <div class="download-action">
+          <a class="btn btn-secondary" href={backHref}>
+            <Icon name="arrow-left" size={14} />
+            {formatTemplate(copy.back, { platform: product.name })}
+          </a>
+        </div>
+      </>
+    )}
+  </div>
+
+  <aside class="download-side">
+    <AdSlot locale={locale} slot="download" format="rect" />
+    <div class="security-panel">
+      <p class="security-panel__title">{copy.securityTitle}</p>
+      <ul>
+        {copy.security.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+    <div class="security-panel">
+      <p class="security-panel__title">{copy.whatsNext}</p>
+      <p class="security-panel__body">{copy.whatsNextBody}</p>
+    </div>
+  </aside>
+</div>
+
+<style>
+  .security-panel__body {
+    margin-top: 12px;
+    color: var(--color-muted);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+</style>

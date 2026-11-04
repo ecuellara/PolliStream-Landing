@@ -1,0 +1,33 @@
+---
+import Layout from '../components/Layout.astro'
+import Icon from '../components/Icon.astro'
+import { alternatesForHome, getContent, homePath } from '../lib/i18n'
+
+const locale = 'es' as const
+const t = getContent(locale)
+const home = homePath(locale)
+---
+
+<Layout
+  locale={locale}
+  title={`${t.notFound.title} — PolliStream`}
+  description={t.notFound.body}
+  alternates={alternatesForHome()}
+  canonicalPath="/404.html"
+  noindex={true}
+  downloadHref={`${home}#platforms`}
+>
+  <div class="container-page error-page">
+    <div>
+      <h1 class="error-code">404</h1>
+      <p class="eyebrow" style="justify-content: center;">{t.notFound.title}</p>
+      <p class="section-lead" style="margin: 18px auto 0;">{t.notFound.body}</p>
+      <div class="hero-actions" style="justify-content: center;">
+        <a class="btn btn-primary" href={home}>
+          <Icon name="arrow-left" size={14} />
+          {t.notFound.cta}
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

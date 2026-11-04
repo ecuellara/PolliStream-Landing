@@ -1,0 +1,78 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import { getContent, homePath } from '../lib/i18n'
+import { affiliate, site, support } from '../data/site'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+const shareUrl = `${site.url}${homePath(locale)}`
+const hasSupport = support.links.length > 0
+const hasAffiliate = affiliate.enabled && affiliate.links.length > 0
+---
+
+<section class="section section--tight container-page" id="support">
+  <div class="split-panels" data-reveal>
+    <article class="callout">
+      <p class="eyebrow">{t.support.kicker}</p>
+      <h2 class="callout__title">{t.support.title}</h2>
+      <p class="callout__body">{t.support.body}</p>
+
+      <div class="callout__actions">
+        {hasSupport ? (
+          support.links.map((link) => (
+            <a class="btn btn-primary btn-sm" href={link.url} target="_blank" rel="noopener">
+              <Icon name="coffee" size={14} />
+              {link.label}
+            </a>
+          ))
+        ) : (
+          <button
+            class="btn btn-primary btn-sm"
+            type="button"
+            data-share
+            data-share-url={shareUrl}
+            data-share-title="PolliStream"
+            data-share-label={t.support.share}
+            data-copied-label={t.support.copied}
+          >
+            <Icon name="share" size={14} />
+            {t.support.share}
+          </button>
+        )}
+      </div>
+
+      {!hasSupport && <p class="callout__note">{t.support.fallback}</p>}
+    </article>
+
+    {hasAffiliate && (
+      <article class="callout callout--affiliate">
+        <p class="eyebrow">{t.affiliate.kicker}</p>
+        <h2 class="callout__title">{t.affiliate.title}</h2>
+        <p class="callout__body">{t.affiliate.body}</p>
+
+        <div class="callout__actions">
+          {affiliate.links.map((link) => (
+            <a
+              class="btn btn-secondary btn-sm"
+              href={link.url}
+              target="_blank"
+              rel="sponsored noopener"
+              data-track="affiliate_click"
+              data-track-label={link.name}
+            >
+              {link.name}
+              <Icon name="arrow-up-right" size={14} />
+            </a>
+          ))}
+        </div>
+
+        <p class="callout__note">{t.affiliate.disclosure}</p>
+      </article>
+    )}
+  </div>
+</section>

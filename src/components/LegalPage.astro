@@ -1,0 +1,117 @@
+---
+import Layout from './Layout.astro'
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import type { LegalDocSlug } from '../lib/i18n'
+import { alternatesForLegal, getContent, homePath, legalPath } from '../lib/i18n'
+import { site } from '../data/site'
+
+interface Props {
+  locale: Locale
+  doc: LegalDocSlug
+}
+
+const { locale, doc } = Astro.props
+const t = getContent(locale)
+const copy = t.legal[doc]
+const alternates = alternatesForLegal(doc)
+const home = homePath(locale)
+const docs: { slug: LegalDocSlug; label: string }[] = [
+  { slug: 'privacy', label: t.footer.privacy },
+  { slug: 'terms', label: t.footer.terms },
+  { slug: 'cookies', label: t.footer.cookies },
+]
+---
+
+<Layout
+  locale={locale}
+  title={`${copy.title} — PolliStream`}
+  description={copy.description}
+  alternates={alternates}
+  canonicalPath={legalPath(locale, doc)}
+  downloadHref={`${home}#platforms`}
+>
+  <div class="container-page legal-page">
+    <div class="legal-layout">
+      <nav class="legal-nav" aria-label={t.legal.hubTitle}>
+        <p class="eyebrow">{t.legal.hubTitle}</p>
+        {docs.map((item) => (
+          <a
+            href={legalPath(locale, item.slug)}
+            aria-current={item.slug === doc ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))}
+        <a href={home}>
+          <Icon name="arrow-left" size={12} /> {t.legal.backHome}
+        </a>
+      </nav>
+
+      <article class="legal-body">
+        <p class="eyebrow">{t.legal.hubTitle}</p>
+        <h1>{copy.title}</h1>
+        <p class="legal-meta">{copy.updated}</p>
+        <p>{copy.intro}</p>
+
+        {copy.sections.map((section) => (
+          <section>
+            <h2>{section.title}</h2>
+            {section.body.map((paragraph) => <p>{paragraph}</p>)}
+          </section>
+        ))}
+
+        {doc === 'cookies' && (
+          <div class="legal-consent">
+            <p>{t.common.consentBody}</p>
+            <button class="btn btn-secondary btn-sm" type="button" data-consent-open>
+              <Icon name="check" size={14} />
+              {t.common.consentTitle}
+            </button>
+          </div>
+        )}
+
+        {site.contactEmail && (
+          <p class="legal-contact">
+            {t.footer.contact}: <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
+          </p>
+        )}
+      </article>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .legal-consent {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 32px;
+    padding: 18px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: rgba(198, 255, 61, 0.04);
+  }
+
+  .legal-consent p {
+    margin: 0;
+    max-width: 56ch;
+    font-size: 0.85rem;
+  }
+
+  .legal-contact {
+    margin-top: 32px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-white-10);
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+
+  .legal-contact a {
+    color: var(--color-lime);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

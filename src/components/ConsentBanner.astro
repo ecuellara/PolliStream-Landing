@@ -1,0 +1,25 @@
+---
+import type { Locale } from '../data/content/types'
+import { getContent, legalPath } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+---
+
+<div class="consent" data-consent-banner hidden role="dialog" aria-live="polite" aria-label={t.common.consentTitle}>
+  <p class="consent__title">{t.common.consentTitle}</p>
+  <p class="consent__body">{t.common.consentBody}</p>
+  <div class="consent__actions">
+    <button class="btn btn-primary btn-sm" type="button" data-consent-accept>
+      {t.common.consentAccept}
+    </button>
+    <button class="btn btn-secondary btn-sm" type="button" data-consent-essential>
+      {t.common.consentEssential}
+    </button>
+  </div>
+  <a class="consent__link" href={legalPath(locale, 'cookies')}>{t.common.consentLink}</a>
+</div>

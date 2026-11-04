@@ -1,0 +1,94 @@
+---
+import Layout from './Layout.astro'
+import DownloadGate from './DownloadGate.astro'
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import type { ProductMeta } from '../data/products'
+import { alternatesForDownload, downloadPath, getContent, homePath, productPath } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+  product: ProductMeta
+}
+
+const { locale, product } = Astro.props
+const t = getContent(locale)
+const alternates = alternatesForDownload(product.slug)
+const downloadHref = downloadPath(locale, product.slug)
+const productHref = productPath(locale, product.slug)
+const home = homePath(locale)
+---
+
+<Layout
+  locale={locale}
+  title={`${t.download.title} · ${product.name} — PolliStream`}
+  description={t.download.description.replace('{platform}', product.name)}
+  alternates={alternates}
+  canonicalPath={downloadHref}
+  noindex={true}
+  downloadHref={product.status === 'live' ? downloadHref : productHref}
+>
+  <div class="container-page">
+    <nav class="breadcrumb" aria-label={t.common.breadcrumb}>
+      <a href={home}>{t.common.back}</a>
+      <span aria-hidden="true">/</span>
+      <a href={productHref}>{product.name}</a>
+      <span aria-hidden="true">/</span>
+      <span>{t.common.download}</span>
+    </nav>
+
+    <DownloadGate locale={locale} product={product} />
+
+    <div class="download-footnote">
+      <a href={productHref}>
+        <Icon name="info" size={14} />
+        {t.common.requirements} · {product.name}
+      </a>
+      <a href={`${home}#platforms`}>
+        <Icon name="grid" size={14} />
+        {t.platforms.all}
+      </a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 24px;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-lime);
+  }
+
+  .download-footnote {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 8px 0 40px;
+    border-top: 1px solid var(--color-white-10);
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .download-footnote a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .download-footnote a:hover {
+    color: var(--color-lime);
+  }
+</style>

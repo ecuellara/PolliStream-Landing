@@ -1,0 +1,48 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import { getContent } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+---
+
+<section class="section section--tight container-page" id="signal">
+  <div class="signal-panel" data-reveal>
+    <div class="section-head">
+      <p class="eyebrow">{t.signal.kicker}</p>
+      <div class="section-head__row">
+        <h2 class="section-title">{t.signal.title}</h2>
+        <p class="section-lead">{t.signal.body}</p>
+      </div>
+    </div>
+
+    <div class="signal-flow">
+      {t.signal.nodes.map((node) => (
+        <article class="signal-node">
+          <span class="signal-node__index">{node.index}</span>
+          <h3 class="signal-node__title">{node.title}</h3>
+          <p class="signal-node__body">{node.body}</p>
+        </article>
+      ))}
+    </div>
+
+    <p class="signal-note">{t.signal.note}</p>
+    <div class="signal-cta">
+      <a class="btn btn-secondary btn-sm" href="#install">
+        {t.signal.cta}
+        <Icon name="arrow-right" size={14} class="arrow" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .signal-cta {
+    margin-top: 22px;
+  }
+</style>

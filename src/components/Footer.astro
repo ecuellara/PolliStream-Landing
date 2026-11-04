@@ -1,0 +1,90 @@
+---
+import type { Locale } from '../data/content/types'
+import { getContent, homePath, legalPath, productPath } from '../lib/i18n'
+import { products } from '../data/products'
+import { site } from '../data/site'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+const home = homePath(locale)
+const year = new Date().getFullYear()
+const copyright = t.footer.copyright.replace('{year}', String(year))
+---
+
+<footer class="site-footer">
+  <div class="container-page">
+    <div class="footer-grid">
+      <div>
+        <a href={home} class="brand" aria-label="PolliStream">
+          <img src="/brand/icon-64.png" alt="" width="38" height="38" class="brand__mark" loading="lazy" decoding="async" />
+          <span class="brand__name">Polli<span>Stream</span></span>
+        </a>
+        <p class="footer-brand__tagline">{t.footer.tagline}</p>
+        <span class="footer-status">{t.footer.status}</span>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col__title">{t.footer.platforms}</p>
+        <ul>
+          {products.map((product) => (
+            <li>
+              <a href={productPath(locale, product.slug)}>{product.name}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col__title">{t.footer.support}</p>
+        <ul>
+          <li><a href={`${home}#faq`}>{t.nav.faq}</a></li>
+          <li><a href={`${home}#install`}>{t.nav.install}</a></li>
+          <li><a href={`${home}#support`}>{t.nav.support}</a></li>
+          {site.contactEmail && <li><a href={`mailto:${site.contactEmail}`}>{t.footer.contact}</a></li>}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col__title">{t.footer.legal}</p>
+        <ul>
+          <li><a href={legalPath(locale, 'privacy')}>{t.footer.privacy}</a></li>
+          <li><a href={legalPath(locale, 'terms')}>{t.footer.terms}</a></li>
+          <li><a href={legalPath(locale, 'cookies')}>{t.footer.cookies}</a></li>
+          <li>
+            <button type="button" class="footer-col__button" data-consent-open>
+              {t.common.consentTitle}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>{copyright}</p>
+      <p>{t.footer.disclaimer}</p>
+    </div>
+
+    <a class="footer-wordmark" href={home} aria-hidden="true" tabindex="-1">POLLISTREAM</a>
+  </div>
+</footer>
+
+<style>
+  .footer-col__button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: rgba(243, 247, 239, 0.72);
+    font: inherit;
+    font-size: 0.84rem;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .footer-col__button:hover {
+    color: var(--color-lime);
+  }
+</style>

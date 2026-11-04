@@ -1,0 +1,29 @@
+---
+import type { Locale } from '../data/content/types'
+import { getContent } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+---
+
+<section class="section container-page" id="faq">
+  <header class="section-head" data-reveal>
+    <p class="eyebrow">{t.faq.kicker}</p>
+    <div class="section-head__row">
+      <h2 class="section-title">{t.faq.title}</h2>
+    </div>
+  </header>
+
+  <div class="faq-list" data-reveal>
+    {t.faq.items.map((item, index) => (
+      <details class="faq-item" open={index === 0}>
+        <summary>{item.question}</summary>
+        <p class="faq-item__answer">{item.answer}</p>
+      </details>
+    ))}
+  </div>
+</section>

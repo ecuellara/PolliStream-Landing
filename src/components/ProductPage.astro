@@ -1,0 +1,586 @@
+---
+import Layout from './Layout.astro'
+import Icon from './Icon.astro'
+import DeviceDemo from './DeviceDemo.astro'
+import AdSlot from './AdSlot.astro'
+import type { Locale } from '../data/content/types'
+import type { ProductMeta } from '../data/products'
+import {
+  alternatesForProduct,
+  downloadPath,
+  getContent,
+  homePath,
+  platformLabel,
+  productPath,
+} from '../lib/i18n'
+import { products } from '../data/products'
+import { site } from '../data/site'
+
+interface Props {
+  locale: Locale
+  product: ProductMeta
+}
+
+const { locale, product } = Astro.props
+const t = getContent(locale)
+const copy = t.product.items[product.slug]
+const alternates = alternatesForProduct(product.slug)
+const home = homePath(locale)
+const productHref = productPath(locale, product.slug)
+const downloadHref = downloadPath(locale, product.slug)
+const isLive = product.status === 'live'
+const related = products.filter((item) => item.slug !== product.slug).slice(0, 3)
+
+const operatingSystem =
+  product.slug === 'lg'
+    ? 'LG webOS 4+'
+    : product.slug === 'samsung'
+      ? 'Samsung Tizen'
+      : product.slug === 'android'
+        ? 'Android'
+        : product.slug === 'android-tv'
+          ? 'Android TV, Fire TV'
+          : 'Windows'
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: `PolliStream for ${product.name}`,
+    applicationCategory: 'MultimediaApplication',
+    operatingSystem,
+    softwareVersion: product.version,
+    description: copy.description,
+    url: `${site.url}${productHref}`,
+    image: `${site.url}${site.ogImages[locale]}`,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'EUR',
+    },
+    ...(isLive && product.downloadMode !== 'locker'
+      ? {
+          downloadUrl: product.downloadUrl.startsWith('http')
+            ? product.downloadUrl
+            : `${site.url}${product.downloadUrl}`,
+        }
+      : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: t.product.breadcrumb,
+        item: `${site.url}${home}#platforms`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: product.name,
+        item: `${site.url}${productHref}`,
+      },
+    ],
+  },
+]
+---
+
+<Layout
+  locale={locale}
+  title={`${copy.title} — PolliStream`}
+  description={copy.description}
+  alternates={alternates}
+  canonicalPath={productHref}
+  downloadHref={isLive ? downloadHref : `${home}#platforms`}
+  jsonLd={jsonLd}
+>
+  <div class="container-page product-page">
+    <nav class="breadcrumb" aria-label={t.common.breadcrumb}>
+      <a href={`${home}#platforms`}>{t.product.breadcrumb}</a>
+      <span aria-hidden="true">/</span>
+      <span>{product.name}</span>
+    </nav>
+
+    <header class="product-hero">
+      <div class="product-hero__copy" data-reveal>
+        <p class="eyebrow">{copy.kicker}</p>
+        <h1 class="product-title">{copy.title}</h1>
+        <p class="product-tagline">{copy.tagline}</p>
+        <p class="product-description">{copy.description}</p>
+
+        <div class="product-badges">
+          <span class="product-badge" data-status={product.status}>
+            <span class="product-badge__dot"></span>
+            {isLive ? t.platforms.live : t.platforms.soon}
+          </span>
+          <span class="product-badge">{platformLabel(locale, product.slug)}</span>
+          <span class="product-badge">{product.fileType}</span>
+          {product.version !== '—' && <span class="product-badge">v{product.version}</span>}
+        </div>
+
+        <div class="hero-actions">
+          {isLive ? (
+            <a class="btn btn-primary" href={downloadHref}>
+              <Icon name="download" size={15} />
+              {t.common.downloadFree}
+            </a>
+          ) : (
+            <span class="btn btn-primary" aria-disabled="true">
+              <Icon name="clock" size={15} />
+              {t.common.comingSoon}
+            </span>
+          )}
+          <a class="btn btn-secondary" href={`${home}#platforms`}>
+            <Icon name="arrow-left" size={14} />
+            {t.product.other}
+          </a>
+        </div>
+      </div>
+
+      <div class="product-hero__device" data-reveal>
+        <DeviceDemo locale={locale} initial={product.slug} showPicker={false} showLink={false} />
+      </div>
+    </header>
+
+    <section class="product-section" data-reveal>
+      <div class="product-section__head">
+        <p class="eyebrow">{t.product.sectionKicker}</p>
+        <h2 class="section-title">{t.product.sectionTitle}</h2>
+      </div>
+
+      <div class="product-specs">
+        <div class="product-specs__card">
+          <h3 class="product-specs__title">{t.product.specs}</h3>
+          <dl class="product-specs__list">
+            <div><dt>{t.common.version}</dt><dd>{product.version}</dd></div>
+            <div><dt>{t.common.size}</dt><dd>{product.size}</dd></div>
+            <div><dt>{t.common.format}</dt><dd>{product.fileType}</dd></div>
+            <div><dt>{t.product.requirements}</dt><dd>{platformLabel(locale, product.slug)}</dd></div>
+            {product.updated && <div><dt>{t.common.updated}</dt><dd>{product.updated}</dd></div>}
+            {product.sha256 && <div class="product-specs__wide"><dt>SHA-256</dt><dd>{product.sha256}</dd></div>}
+          </dl>
+          {isLive ? (
+            <a class="btn btn-primary btn-sm" href={downloadHref}>
+              <Icon name="download" size={14} />
+              {t.common.download}
+            </a>
+          ) : (
+            <span class="btn btn-secondary btn-sm" aria-disabled="true">{t.common.comingSoon}</span>
+          )}
+        </div>
+
+        <div class="product-specs__card">
+          <h3 class="product-specs__title">{t.common.requirements}</h3>
+          <ul class="product-checks">
+            {copy.requirements.map((item) => (
+              <li>
+                <Icon name="check" size={15} />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          {copy.note && <p class="product-note">{copy.note}</p>}
+        </div>
+      </div>
+    </section>
+
+    <section class="product-section" data-reveal>
+      <div class="product-section__head">
+        <p class="eyebrow">{t.features.kicker}</p>
+        <h2 class="section-title">{t.features.title}</h2>
+      </div>
+      <div class="feature-rack product-features">
+        {copy.features.map((item) => (
+          <article class="feature-module">
+            <div class="feature-module__top">
+              <span class="feature-module__index">{item.index}</span>
+              <span class="feature-module__tag">{item.tag}</span>
+            </div>
+            <h3 class="feature-module__title">{item.title}</h3>
+            <p class="feature-module__body">{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="product-section" data-reveal>
+      <div class="product-section__head">
+        <p class="eyebrow">{t.install.kicker}</p>
+        <h2 class="section-title">{t.product.install}</h2>
+      </div>
+      <div class="steps">
+        {copy.install.map((step) => (
+          <article class="step">
+            <div class="step__index">{step.index}</div>
+            <h3 class="step__title">{step.title}</h3>
+            <p class="step__body">{step.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <div class="ad-wrap">
+      <AdSlot locale={locale} slot="product" />
+    </div>
+
+    <section class="product-section" data-reveal>
+      <div class="product-section__head">
+        <p class="eyebrow">{t.product.related}</p>
+        <h2 class="section-title">{t.product.other}</h2>
+      </div>
+      <div class="related-grid">
+        {related.map((item) => (
+          <a class="related-card" href={productPath(locale, item.slug)}>
+            <span class="related-card__icon"><Icon name={item.icon} size={22} /></span>
+            <span class="related-card__body">
+              <span class="related-card__name">{item.name}</span>
+              <span class="related-card__meta">{platformLabel(locale, item.slug)} · {item.fileType}</span>
+            </span>
+            <Icon name="arrow-up-right" size={16} />
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="product-section product-cta" data-reveal>
+      <div>
+        <p class="eyebrow">{t.platforms.kicker}</p>
+        <h2 class="section-title">
+          {t.hero.titleA} <span class="text-lime">{t.hero.titleB}</span>
+        </h2>
+        <p class="section-lead product-cta__lead">{t.platforms.body}</p>
+      </div>
+      <div class="hero-actions">
+        {isLive ? (
+          <a class="btn btn-primary" href={downloadHref}>
+            <Icon name="download" size={15} />
+            {t.common.downloadFree}
+          </a>
+        ) : (
+          <span class="btn btn-primary" aria-disabled="true">{t.common.comingSoon}</span>
+        )}
+        <a class="btn btn-secondary" href={`${home}#platforms`}>{t.platforms.all}</a>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .product-page {
+    padding-bottom: clamp(3rem, 7vw, 6rem);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 24px;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-lime);
+  }
+
+  .product-hero {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+
+  @media (min-width: 1024px) {
+    .product-hero {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    }
+  }
+
+  .product-title {
+    margin-top: 20px;
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 5.8vw, 5rem);
+    font-weight: 650;
+    letter-spacing: -0.055em;
+    line-height: 0.92;
+  }
+
+  .product-tagline {
+    margin-top: 22px;
+    max-width: 48ch;
+    color: var(--color-paper);
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 480;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+
+  .product-description {
+    margin-top: 16px;
+    max-width: 56ch;
+    color: var(--color-muted);
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
+  .product-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 22px;
+  }
+
+  .product-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border: 1px solid var(--color-white-10);
+    border-radius: 999px;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .product-badge[data-status='live'] {
+    border-color: var(--color-line-strong);
+    color: var(--color-lime);
+  }
+
+  .product-badge__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .product-section {
+    padding-block: clamp(2.5rem, 5vw, 4.5rem);
+    border-top: 1px solid var(--color-white-10);
+  }
+
+  .product-section__head {
+    margin-bottom: clamp(1.8rem, 3vw, 2.6rem);
+  }
+
+  .product-section__head .section-title {
+    margin-top: 16px;
+  }
+
+  .product-specs {
+    display: grid;
+    gap: 14px;
+  }
+
+  @media (min-width: 860px) {
+    .product-specs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .product-specs__card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-lg);
+    background: var(--color-panel);
+  }
+
+  .product-specs__title {
+    color: var(--color-lime);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .product-specs__list {
+    width: 100%;
+    margin-top: 18px;
+    border-top: 1px solid var(--color-white-10);
+  }
+
+  .product-specs__list > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--color-white-05);
+  }
+
+  .product-specs__list dt {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .product-specs__list dd {
+    margin: 0;
+    color: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .product-specs__wide {
+    display: block !important;
+  }
+
+  .product-specs__wide dd {
+    margin-top: 6px;
+    text-align: left;
+    font-size: 9px;
+    word-break: break-all;
+  }
+
+  .product-specs__card .btn {
+    margin-top: 20px;
+  }
+
+  .product-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .product-checks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #b9c4bb;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .product-checks svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--color-lime);
+  }
+
+  .product-note {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-white-10);
+    color: rgba(148, 163, 154, 0.8);
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .product-features {
+    border-top: 1px solid var(--color-white-10);
+    border-left: 1px solid var(--color-white-10);
+  }
+
+  @media (min-width: 700px) {
+    .product-features {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .ad-wrap {
+    padding-block: 8px;
+  }
+
+  .related-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  @media (min-width: 760px) {
+    .related-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .related-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-md);
+    background: var(--color-panel);
+    transition:
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .related-card:hover {
+    border-color: var(--color-line-strong);
+    transform: translateY(-2px);
+  }
+
+  .related-card__icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-lime);
+  }
+
+  .related-card__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .related-card__name {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .related-card__meta {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .related-card > svg {
+    color: var(--color-muted);
+  }
+
+  .product-cta {
+    display: grid;
+    gap: 24px;
+    align-items: end;
+  }
+
+  @media (min-width: 900px) {
+    .product-cta {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  .product-cta .section-title {
+    margin-top: 16px;
+    max-width: 22ch;
+  }
+
+  .product-cta__lead {
+    margin-top: 16px;
+  }
+</style>

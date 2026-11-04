@@ -1,0 +1,31 @@
+{
+  "name": "pollistream-landing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "predev": "node scripts/sync-installers.mjs",
+    "dev": "astro dev",
+    "prebuild": "node scripts/sync-installers.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "precheck": "node scripts/sync-installers.mjs",
+    "check": "astro check",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name pollistream",
+    "r2:upload": "node scripts/upload-r2.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@tailwindcss/vite": "^4.3.4",
+    "puppeteer-core": "^25.16.0",
+    "tailwindcss": "^4.3.4",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.157.0"
+  }
+}

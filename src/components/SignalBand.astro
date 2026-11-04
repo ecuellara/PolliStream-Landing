@@ -1,0 +1,22 @@
+---
+import type { Locale } from '../data/content/types'
+import { getContent } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+const items = t.features.items.map((item) => `${item.tag} · ${item.title}`)
+---
+
+<div class="signal-band" aria-hidden="true">
+  <div class="signal-band__track">
+    {[0, 1].map(() => (
+      <div class="signal-band__group">
+        {items.map((item) => <span>{item}</span>)}
+      </div>
+    ))}
+  </div>
+</div>

@@ -1,0 +1,68 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import { getContent, downloadPath, platformLabel, productPath } from '../lib/i18n'
+import { products } from '../data/products'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+const classFor = (slug: string): string => {
+  if (slug === 'lg') return 'platform-card platform-card--lg'
+  if (slug === 'samsung') return 'platform-card platform-card--half'
+  return 'platform-card platform-card--third'
+}
+---
+
+<section class="section container-page" id="platforms">
+  <header class="section-head" data-reveal>
+    <p class="eyebrow">{t.platforms.kicker}</p>
+    <div class="section-head__row">
+      <h2 class="section-title">{t.platforms.title}</h2>
+      <p class="section-lead">{t.platforms.body}</p>
+    </div>
+  </header>
+
+  <div class="platform-grid">
+    {products.map((product, index) => (
+      <article class={classFor(product.slug)} data-accent={product.accent} data-reveal>
+        <div class="platform-card__top">
+          <span class="platform-card__icon">
+            <Icon name={product.icon} size={24} />
+          </span>
+          <span class="platform-card__index">{String(index + 1).padStart(2, '0')} / 05</span>
+        </div>
+
+        <span class="platform-card__status" data-status={product.status}>
+          {product.status === 'live' ? t.platforms.live : t.platforms.soon}
+        </span>
+
+        <p class="platform-card__platform">{platformLabel(locale, product.slug)}</p>
+        <h3 class="platform-card__name">{product.name}</h3>
+
+        <div class="platform-card__meta">
+          <span>{t.common.version} <strong>{product.version}</strong></span>
+          <span>{t.common.size} <strong>{product.size}</strong></span>
+          <span>{t.common.format} <strong>{product.fileType}</strong></span>
+        </div>
+
+        <div class="platform-card__footer">
+          {product.status === 'live' ? (
+            <a class="platform-card__cta" href={downloadPath(locale, product.slug)}>
+              {t.platforms.cta}
+              <Icon name="arrow-right" size={14} />
+            </a>
+          ) : (
+            <a class="platform-card__cta" href={productPath(locale, product.slug)}>
+              {t.common.readMore}
+              <Icon name="arrow-right" size={14} />
+            </a>
+          )}
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

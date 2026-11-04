@@ -1,0 +1,27 @@
+---
+import type { Locale } from '../data/content/types'
+import { htmlLang, localeNames, localeShort, locales } from '../lib/i18n'
+
+interface Props {
+  current: Locale
+  alternates: Record<Locale, string>
+  variant?: 'desktop' | 'mobile'
+}
+
+const { current, alternates, variant = 'desktop' } = Astro.props
+const className = variant === 'desktop' ? 'lang-switcher' : 'mobile-lang'
+---
+
+<nav class={className} aria-label="Language / Idioma">
+  {locales.map((locale) => (
+    <a
+      href={alternates[locale]}
+      hreflang={htmlLang[locale]}
+      lang={htmlLang[locale]}
+      aria-current={locale === current ? 'true' : undefined}
+      title={localeNames[locale]}
+    >
+      {localeShort[locale]}
+    </a>
+  ))}
+</nav>

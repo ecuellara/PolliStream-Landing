@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../data/content/types'
+import { getContent } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+---
+
+<section class="section container-page" id="install">
+  <header class="section-head" data-reveal>
+    <p class="eyebrow">{t.install.kicker}</p>
+    <div class="section-head__row">
+      <h2 class="section-title">{t.install.title}</h2>
+      <p class="section-lead">{t.install.body}</p>
+    </div>
+  </header>
+
+  <div class="steps" data-reveal>
+    {t.install.steps.map((step) => (
+      <article class="step">
+        <div class="step__index">{step.index}</div>
+        <h3 class="step__title">{step.title}</h3>
+        <p class="step__body">{step.body}</p>
+      </article>
+    ))}
+  </div>
+
+  <p class="install-note">{t.install.note}</p>
+</section>
+
+<style>
+  .install-note {
+    margin-top: 20px;
+    max-width: 70ch;
+    color: rgba(148, 163, 154, 0.75);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+</style>

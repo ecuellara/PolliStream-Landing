@@ -1,0 +1,142 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import type { ProductSlug } from '../data/products'
+import { products, getProduct } from '../data/products'
+import { getContent, downloadPath } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+  initial?: ProductSlug
+  showPicker?: boolean
+  showLink?: boolean
+  class?: string
+}
+
+const { locale, initial = 'lg', showPicker = true, showLink = true, class: className = '' } = Astro.props
+const t = getContent(locale)
+const current = getProduct(initial) ?? products[0]
+const displayLabel = (product: (typeof products)[number]): string => {
+  const device = t.hero.deviceLabels[product.slug]
+  return product.name.toLowerCase().includes(device.toLowerCase())
+    ? product.name
+    : `${product.name} · ${device}`
+}
+const initialLabel = displayLabel(current)
+---
+
+<div class={`device-stage ${className}`} data-device-stage>
+  <span class="device-stage__label" data-device-label>{initialLabel}</span>
+  <span class="device-stage__code">{t.hero.demoLabel}</span>
+
+  <div class="device" data-device={current.slug} aria-hidden="true">
+    <div class="device-shell">
+      <div class="device-screen">
+        <div class="device-topbar">
+          <div class="device-topbar__brand">
+            <span class="device-topbar__dot"></span>
+            PolliStream
+          </div>
+          <div class="device-topbar__right">
+            <span>{t.device.live}</span>
+            <span>20:00</span>
+          </div>
+        </div>
+
+        <div class="device-body">
+          <div class="device-sidebar" aria-hidden="true">
+            <span class="device-sidebar__item" data-active="true"><Icon name="grid" size={12} /></span>
+            <span class="device-sidebar__item"><Icon name="tv" size={12} /></span>
+            <span class="device-sidebar__item"><Icon name="play" size={12} filled /></span>
+            <span class="device-sidebar__item"><Icon name="heart" size={12} /></span>
+            <span class="device-sidebar__item"><Icon name="clock" size={12} /></span>
+          </div>
+
+          <div class="device-main">
+            <div class="device-main__meta">
+              <span>{t.device.now} · 20:00</span>
+              <span>{t.device.signal}</span>
+            </div>
+            <div class="device-main__channel">
+              <div class="device-main__number">{t.device.channel}</div>
+              <div class="device-main__title">{t.device.titleLine1}<br />{t.device.titleLine2}</div>
+              <div class="device-main__program">{t.device.sample}</div>
+              <div class="device-progress"></div>
+              <div class="device-badges">
+                <span class="device-badge">{t.device.audio}</span>
+                <span class="device-badge">{t.device.subtitles}</span>
+                <span class="device-badge">{t.device.quality}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="device-guide" aria-hidden="true">
+            <span class="device-guide__title">{t.device.guide}</span>
+            {t.device.guideItems.map((item, index) => (
+              <span class="device-guide__item" data-active={index === 0 ? 'true' : undefined}>
+                <span class="device-guide__num">{String(index + 1).padStart(2, '0')}</span> {item}
+              </span>
+            ))}
+            <span class="device-guide__bar"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="device-stand"></div>
+  </div>
+
+  {showPicker && (
+    <div class="platform-picker" role="group" aria-label={t.hero.selectLabel}>
+      {products.map((product) => (
+        <button
+          type="button"
+          class="platform-pick"
+          aria-pressed={product.slug === initial ? 'true' : 'false'}
+          aria-label={`${product.name} — ${t.hero.deviceLabels[product.slug]}`}
+          data-platform-pick={product.slug}
+          data-platform-name={displayLabel(product)}
+          data-platform-href={downloadPath(locale, product.slug)}
+        >
+          <Icon name={product.icon} size={16} />
+          <span>{t.hero.deviceLabels[product.slug]}</span>
+        </button>
+      ))}
+    </div>
+  )}
+
+  {showLink && (
+    <div class="device-link">
+      <span class="mono">{t.hero.selectLabel}</span>
+      <a class="platform-card__cta" data-platform-link href={downloadPath(locale, current.slug)}>
+        {t.platforms.cta}
+        <Icon name="arrow-right" size={14} />
+      </a>
+    </div>
+  )}
+</div>
+
+<style>
+  .device-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-white-10);
+  }
+
+  .device-link .mono {
+    color: var(--color-muted);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 520px) {
+    .device-link {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

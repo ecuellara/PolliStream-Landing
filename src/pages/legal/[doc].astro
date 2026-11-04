@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro'
+import LegalPage from '../../components/LegalPage.astro'
+import type { LegalDocSlug } from '../../lib/i18n'
+
+export const getStaticPaths: GetStaticPaths = () => [
+  { params: { doc: 'privacidad' }, props: { doc: 'privacy' } },
+  { params: { doc: 'terminos' }, props: { doc: 'terms' } },
+  { params: { doc: 'cookies' }, props: { doc: 'cookies' } },
+]
+
+const { doc } = Astro.props as { doc: LegalDocSlug }
+---
+
+<LegalPage locale="es" doc={doc} />
