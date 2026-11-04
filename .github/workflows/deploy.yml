@@ -37,10 +37,7 @@ jobs:
           SITE_URL: ${{ vars.SITE_URL || 'https://pollistream.pages.dev' }}
           PUBLIC_CF_BEACON_TOKEN: ${{ secrets.PUBLIC_CF_BEACON_TOKEN }}
           PUBLIC_PLAUSIBLE_DOMAIN: ${{ vars.PUBLIC_PLAUSIBLE_DOMAIN }}
-          PUBLIC_R2_BASE_URL: ${{ vars.PUBLIC_R2_BASE_URL }}
           PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
-          LG_IPK_URL: ${{ vars.LG_IPK_URL }}
-          LG_IPK_VERSION: ${{ vars.LG_IPK_VERSION }}
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

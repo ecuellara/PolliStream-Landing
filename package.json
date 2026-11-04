@@ -15,7 +15,8 @@
     "precheck": "node scripts/sync-installers.mjs",
     "check": "astro check",
     "deploy": "npm run build && wrangler pages deploy dist --project-name pollistream",
-    "r2:upload": "node scripts/upload-r2.mjs"
+    "r2:upload": "node scripts/upload-r2.mjs",
+    "github:upload": "node scripts/sync-installers.mjs && node scripts/upload-github-release.mjs"
   },
   "dependencies": {
     "astro": "^7.4.5"

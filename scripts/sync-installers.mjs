@@ -1,16 +1,13 @@
-import { Buffer } from 'node:buffer'
 import { createHash } from 'node:crypto'
 import {
-  copyFileSync,
   existsSync,
-  mkdirSync,
   readFileSync,
   readdirSync,
   rmSync,
   statSync,
   writeFileSync,
 } from 'node:fs'
-import { basename, dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadEnv } from './load-env.mjs'
 
@@ -30,7 +27,7 @@ function walk(dir) {
 }
 
 function versionFromName(name) {
-  const match = name.match(/_(\d+\.\d+\.\d+)_all\.ipk$/i)
+  const match = name.match(/(\d+\.\d+\.\d+)/)
   return match?.[1] ?? ''
 }
 
@@ -55,11 +52,11 @@ function sha256(file) {
   return hash.digest('hex')
 }
 
-function makeEntry({ version, destName, dest, source }) {
-  const size = statSync(dest).size
+function makeEntry({ version, destName, sourceFile, source }) {
+  const size = statSync(sourceFile).size
   if (size > 25 * 1024 * 1024) {
     console.warn(
-      `[installers] ${destName} is ${humanSize(size)}; Cloudflare Pages rejects files over 25 MiB. Host it on R2 or GitHub Releases and set r2Key/directUrl instead.`,
+      `[installers] ${destName} is ${humanSize(size)}; keep it on GitHub Releases instead of deploying it as a Pages asset.`,
     )
   }
   return {
@@ -67,58 +64,42 @@ function makeEntry({ version, destName, dest, source }) {
     version,
     size: humanSize(size),
     bytes: size,
-    url: `/downloads/lg/${destName}`,
+    url: `https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/${destName}`,
     fileName: destName,
-    sha256: sha256(dest),
+    sha256: sha256(sourceFile),
     source,
+    sourcePath: relative(installersDir, sourceFile).replaceAll('\\', '/'),
   }
 }
 
 const result = {}
+const platforms = [
+  { slug: 'lg', extensions: ['.ipk'] },
+  { slug: 'samsung', extensions: ['.wgt'] },
+  { slug: 'android', extensions: ['.apk'] },
+  { slug: 'android-tv', extensions: ['.apk'] },
+  { slug: 'windows', extensions: ['.exe'] },
+]
 
-const lgCandidates = walk(installersDir)
-  .filter((file) => /\.ipk$/i.test(file))
-  .sort((a, b) => compareVersions(versionFromName(basename(b)), versionFromName(basename(a))))
+for (const { slug, extensions } of platforms) {
+  rmSync(join(publicDir, slug), { recursive: true, force: true })
+  const candidates = walk(join(installersDir, slug))
+    .filter((file) => extensions.includes(file.slice(file.lastIndexOf('.')).toLowerCase()))
+    .sort((a, b) => compareVersions(versionFromName(basename(b)), versionFromName(basename(a))))
 
-if (lgCandidates.length > 0) {
-  const source = lgCandidates[0]
-  const sourceName = basename(source)
-  const version = versionFromName(sourceName) || 'latest'
-  const destDir = join(publicDir, 'lg')
-  const destName = `pollistream-lg-${version}.ipk`
-  const dest = join(destDir, destName)
-  rmSync(destDir, { recursive: true, force: true })
-  mkdirSync(destDir, { recursive: true })
-  copyFileSync(source, dest)
-  result.lg = makeEntry({ version, destName, dest, source: sourceName })
-  console.log(`[installers] LG ${version} → ${destName} (${result.lg.size})`)
-} else if (process.env.LG_IPK_URL) {
-  let parsedVersion = ''
-  try {
-    parsedVersion = versionFromName(basename(new URL(process.env.LG_IPK_URL).pathname))
-  } catch {
-    /* The fetch below reports the invalid URL. */
+  if (candidates.length > 0) {
+    const source = candidates[0]
+    const sourceName = basename(source)
+    const version = versionFromName(sourceName) || 'latest'
+    const extension = sourceName.slice(sourceName.lastIndexOf('.')).toLowerCase()
+    const destName = `pollistream-${slug}${extension}`
+    result[slug] = makeEntry({ version, destName, sourceFile: source, source: sourceName })
+    console.log(`[installers] ${slug} ${version} → ${destName} (${result[slug].size})`)
+    continue
   }
-  const version = process.env.LG_IPK_VERSION || parsedVersion || 'latest'
-  const destDir = join(publicDir, 'lg')
-  const destName = `pollistream-lg-${version}.ipk`
-  const dest = join(destDir, destName)
-  try {
-    const response = await fetch(process.env.LG_IPK_URL, { redirect: 'follow' })
-    if (!response.ok) throw new Error(`HTTP ${response.status}`)
-    const buffer = Buffer.from(await response.arrayBuffer())
-    rmSync(destDir, { recursive: true, force: true })
-    mkdirSync(destDir, { recursive: true })
-    writeFileSync(dest, buffer)
-    result.lg = makeEntry({ version, destName, dest, source: process.env.LG_IPK_URL })
-    console.log(`[installers] LG ${version} descargado desde LG_IPK_URL (${result.lg.size})`)
-  } catch (error) {
-    result.lg = { available: false }
-    console.warn(`[installers] LG_IPK_URL no se pudo descargar: ${String(error)}`)
-  }
-} else {
-  result.lg = { available: false }
-  console.warn('[installers] No IPK found in installers/. LG download will show as "coming soon".')
+
+  result[slug] = { available: false }
+  console.warn(`[installers] No compatible installer found in installers/${slug}/.`)
 }
 
 writeFileSync(generatedPath, `${JSON.stringify(result, null, 2)}\n`)

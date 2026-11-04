@@ -7,8 +7,7 @@ Landing estática de PolliStream para Cloudflare Pages. Explica el reproductor, 
 - Salida: HTML estático en `dist/`.
 - Sin backend ni base de datos.
 - Proyecto independiente y autocontenido en `E:\PolliStream-Landing`.
-- Descargas LG: el IPK se copia desde `installers/` al build.
-- Descargas del resto: se configuran en un solo archivo.
+- Descargas: los instaladores se sirven desde una release pública en GitHub; no se incluyen en el build de Pages.
 - Diseño: [`DESIGN.md`](DESIGN.md). Ficha de producto: [`PRODUCT.md`](PRODUCT.md).
 
 ## Arranque
@@ -30,7 +29,7 @@ npm run check     # Astro + TypeScript
 
 | Qué | Archivo |
 |---|---|
-| Dominio, email de contacto, R2, analytics | `src/data/site.ts` + `.env` |
+| Dominio, email de contacto, analytics | `src/data/site.ts` + `.env` |
 | Versiones, tamaños y URLs de descarga | `src/data/products.ts` |
 | Anuncios (AdSense / Adsterra / custom) | `src/data/ads.ts` |
 | Donaciones / Ko-fi / PayPal | `src/data/site.ts` (`support.links`) |
@@ -48,10 +47,7 @@ Copia `.env.example` a `.env` y cambia lo que necesites. En Cloudflare Pages se 
 SITE_URL=https://pollistream.pages.dev
 PUBLIC_CF_BEACON_TOKEN=
 PUBLIC_PLAUSIBLE_DOMAIN=
-PUBLIC_R2_BASE_URL=
 PUBLIC_CONTACT_EMAIL=
-LG_IPK_URL=
-LG_IPK_VERSION=1.0.4
 INSTALLERS_DIR=installers
 ```
 
@@ -59,61 +55,19 @@ INSTALLERS_DIR=installers
 
 ## Descargas
 
-### LG webOS (automático)
+### Instaladores en GitHub Releases
 
-`scripts/sync-installers.mjs` busca el IPK más reciente dentro de `installers/` (`installers/**/*.ipk`), lo copia a `public/downloads/lg/` y genera `src/data/installers.generated.json` con versión, tamaño y SHA-256. Se ejecuta antes de `dev`, `check` y `build`. Si no encuentra el IPK, la tarjeta de LG se muestra como **Próximamente**; coloca el archivo en `installers/lg/` o define `LG_IPK_URL`.
+El proyecto del sitio es privado, por eso los binarios se publican en el repositorio público separado `ecuellara/PolliStream-Downloads`. Las rutas de descarga usan la release `downloads` y nombres de asset estables. El build de Pages no empaqueta los instaladores, incluido el `.exe` de 167 MB.
 
-`installers/*` y `public/downloads/` están en `.gitignore`; los binarios no se versionan por defecto.
-
-> Cloudflare Pages acepta archivos de hasta 25 MiB. El IPK 1.0.4 pesa 22,3 MB, así que entra. Si un build futuro supera el límite, súbelo a R2 o a GitHub Releases.
-
-**Importante para CI:** como `installers/*` está ignorado, un build limpio de GitHub Actions no tendrá el IPK. Tienes dos opciones:
-
-1. Desplegar desde tu máquina con `npm run deploy` (el IPK local se copia a `dist/`).
-2. Definir `LG_IPK_URL` (y `LG_IPK_VERSION`) en las variables del workflow para que `sync-installers.mjs` lo descargue; o subirlo a R2 y usar `r2Key`.
-
-### Samsung, Android, Android TV y Windows
-
-Edita `downloadConfig` en `src/data/products.ts`:
-
-```ts
-samsung: {
-  directUrl: 'https://downloads.tudominio.com/samsung/pollistream-samsung-1.0.0.wgt',
-  fileName: 'pollistream-samsung-1.0.0.wgt',
-  version: '1.0.0',
-  size: '18.4 MB',
-  updated: '2026-11',
-}
-```
-
-Opciones por producto:
-
-- `directUrl`: URL directa al instalador (R2, GitHub Release asset, tu servidor).
-- `lockerUrl`: URL de un link locker / CPA. Tiene prioridad sobre `directUrl`.
-- `githubUrl`: página de release, si no tienes asset directo.
-- `r2Key`: ruta dentro de `PUBLIC_R2_BASE_URL`, por ejemplo `android/pollistream-android-1.0.0.apk`.
-- `version`, `size`, `updated`, `sha256`: metadatos que se muestran en la ficha y en la página de descarga.
-
-Si no hay ninguna URL, la plataforma se muestra como **Próximamente** y nunca se publica un enlace muerto.
-
-### Cloudflare R2
-
-1. Crea un bucket, por ejemplo `pollistream-downloads`.
-2. Activa acceso público o conecta un dominio (`downloads.tudominio.com`).
-3. Sube archivos:
+Deja los binarios en `installers/<plataforma>/` y ejecuta:
 
 ```bash
-npm run build
-# Opcional: R2_BUCKET=pollistream-downloads
-npm run r2:upload -- public/downloads/lg/pollistream-lg-1.0.4.ipk --dry-run
-npm run r2:upload -- public/downloads/lg/pollistream-lg-1.0.4.ipk
+npm run github:upload
 ```
 
-4. Configura `PUBLIC_R2_BASE_URL=https://downloads.tudominio.com` y usa `r2Key` en `products.ts`, por ejemplo `r2Key: 'lg/pollistream-lg-1.0.4.ipk'`.
+El comando sincroniza los archivos y los crea o actualiza como assets de la release de GitHub. Requiere `gh` instalado y autenticado con permiso de escritura en el repositorio público. Samsung usa `.wgt`, Android y Android TV `.apk`, Windows `.exe` y LG `.ipk`.
 
-### GitHub Releases
-
-Publica el instalador como asset de una release y pega la URL del asset en `directUrl`, o la página de la release en `githubUrl`. Para archivos de más de 2 GB, usa R2.
+Los nombres públicos son `pollistream-lg.ipk`, `pollistream-samsung.wgt`, `pollistream-android.apk` y `pollistream-windows.exe`. Si reemplazas un instalador, vuelve a ejecutar el comando. Android TV solo aparecerá disponible cuando haya un APK en su carpeta y se haya publicado.
 
 ## Monetización
 

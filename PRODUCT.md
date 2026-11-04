@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Astro + Tailwind CSS, static output, deployed on Cloudflare Pages. Spanish is the default locale; English and Portuguese are localized routes. Downloads are hosted on Cloudflare R2 or GitHub Releases and linked from a central manifest. The site is a standalone project at `E:\PolliStream-Landing`; it does not share the TV app build or repository.
+Astro + Tailwind CSS, static output, deployed on Cloudflare Pages. Spanish is the default locale; English and Portuguese are localized routes. Downloads are hosted in the public `ecuellara/PolliStream-Downloads` GitHub Releases repository and linked from a central manifest. The site is a standalone project at `E:\PolliStream-Landing`; it does not share the TV app build or repository.
 
 ## Users
 
@@ -27,7 +27,7 @@ One player, one Xtream list, every screen the household already owns. Unlike ser
 - The TV app is built for LG webOS 4.x+ and uses a local service for embedded audio/subtitle track extraction on LG.
 - Additional clients exist for Samsung Tizen, Android mobile, Android TV, and Windows; their installers are published separately.
 - LG installs through the webOS developer flow (Developer Mode + `ares-install`) or a packaged `.ipk`; Android installs from an `.apk`; Windows from an `.exe`/installer; Samsung follows the Tizen install path used by the publisher.
-- Downloads may be direct, hosted on R2/GitHub Releases, or routed through a CPA/locker link. The site must never imply that a download is available when no URL is configured.
+- Downloads use public GitHub Release assets or may be routed through a CPA/locker link. The site must never imply that a download is available when no URL is configured.
 - The site will run on a free `*.pages.dev` subdomain until a custom domain is connected.
 - The product is legal only when used with a provider the user is authorized to access; the site states this and does not supply playlists, credentials, or copyrighted content.
 

@@ -43,27 +43,27 @@ export type DownloadConfig = {
  */
 export const downloadConfig: Record<ProductSlug, DownloadConfig> = {
   lg: {
+    githubUrl:
+      'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-lg.ipk',
     updated: '2026-10',
+    fileName: 'pollistream-lg.ipk',
   },
   samsung: {
-    // directUrl: 'https://downloads.example.com/samsung/pollistream-samsung-1.0.0.wgt',
-    // lockerUrl: 'https://tu-red-cpa.example.com/cl?offer=samsung',
-    // r2Key: 'samsung/pollistream-samsung-1.0.0.wgt',
+    githubUrl:
+      'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-samsung.wgt',
     fileName: 'pollistream-samsung.wgt',
   },
   android: {
-    // directUrl: 'https://downloads.example.com/android/pollistream-android-1.0.0.apk',
-    // lockerUrl: 'https://tu-red-cpa.example.com/cl?offer=android',
+    githubUrl:
+      'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-android.apk',
     fileName: 'pollistream-android.apk',
   },
   'android-tv': {
-    // directUrl: 'https://downloads.example.com/android-tv/pollistream-androidtv-1.0.0.apk',
-    // lockerUrl: 'https://tu-red-cpa.example.com/cl?offer=android-tv',
     fileName: 'pollistream-androidtv.apk',
   },
   windows: {
-    // directUrl: 'https://downloads.example.com/windows/pollistream-windows-1.0.0.exe',
-    // lockerUrl: 'https://tu-red-cpa.example.com/cl?offer=windows',
+    githubUrl:
+      'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-windows.exe',
     fileName: 'pollistream-windows.exe',
   },
 }
