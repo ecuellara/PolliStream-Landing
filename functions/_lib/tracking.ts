@@ -27,6 +27,13 @@ export const TRACKED_PLATFORMS = new Set([
   'ios',
   'yape',
   'paypal',
+  'whatsapp',
+  'telegram',
+  'facebook',
+  'x',
+  'email',
+  'copy',
+  'native',
   'site',
 ])
 

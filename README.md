@@ -143,7 +143,7 @@ La sección `#support` muestra tres tarjetas: **Compartir**, **Yape** y **PayPal
 
 - **Yape**: guarda el QR en `public/donate/yape-qr.png` (PNG cuadrado, mínimo 600×600). La tarjeta se activa sola cuando el archivo existe; si falta, muestra un aviso y nunca abre un QR roto. El modal permite escanear el código y descargar la imagen para usarla desde otro dispositivo.
 - **PayPal**: el enlace usa `paypal.com/donate` con el correo configurado, así que no necesitas un usuario `paypal.me`. Si creas uno, define `handle` en `src/data/site.ts` y el enlace pasará a `paypal.me/<handle>`.
-- **Compartir**: usa Web Share API y, si el navegador no la soporta, copia el enlace.
+- **Compartir**: abre un modal con WhatsApp, Telegram, Facebook, X, correo y “Copiar enlace”; en móvil añade “Más opciones” con el share nativo.
 
 Todo se configura en `src/data/site.ts` (`support.yape` y `support.paypal`). Deja `holder` vacío para ocultar el nombre del beneficiario junto al QR.
 

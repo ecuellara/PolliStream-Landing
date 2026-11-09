@@ -199,38 +199,93 @@ function initPlatformPicker(): void {
 }
 
 function initShare(): void {
-  document.querySelectorAll<HTMLButtonElement>('[data-share]').forEach((button) => {
-    const originalHtml = button.innerHTML
-    button.addEventListener('click', async () => {
-      const url = button.dataset.shareUrl ?? window.location.href
-      const title = button.dataset.shareTitle ?? document.title
-      const copied = button.dataset.copiedLabel ?? 'Copied'
-      track('share_click', { page: window.location.pathname })
+  const dialog = document.querySelector<HTMLDialogElement>('[data-share-modal]')
+  const openers = document.querySelectorAll<HTMLElement>('[data-share-open]')
+  if (!dialog || openers.length === 0) return
 
-      const markCopied = (): void => {
-        button.textContent = copied
-        window.setTimeout(() => {
-          button.innerHTML = originalHtml
-        }, 2200)
-      }
+  const url = dialog.dataset.shareUrl || window.location.href
+  const title = dialog.dataset.shareTitle || document.title
 
-      try {
-        if (navigator.share) {
-          await navigator.share({ title, url })
-          return
-        }
-        await navigator.clipboard.writeText(url)
-        markCopied()
-      } catch {
-        try {
-          await navigator.clipboard.writeText(url)
-          markCopied()
-        } catch {
-          window.prompt('', url)
-        }
-      }
+  openers.forEach((opener) => {
+    opener.addEventListener('click', () => {
+      dialog.showModal()
+      track('share_click', { platform: 'site' })
     })
   })
+
+  dialog.querySelectorAll<HTMLElement>('[data-share-close]').forEach((button) => {
+    button.addEventListener('click', () => dialog.close())
+  })
+
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close()
+  })
+
+  // Explicit social targets, so desktop visitors always get real options
+  // instead of the limited native share sheet.
+  dialog.querySelectorAll<HTMLElement>('[data-share-network]').forEach((link) => {
+    link.addEventListener('click', () => {
+      track('share_click', { platform: link.dataset.shareNetwork ?? 'site' })
+      dialog.close()
+    })
+  })
+
+  const copy = dialog.querySelector<HTMLButtonElement>('[data-share-copy]')
+  if (copy) {
+    const label = copy.querySelector<HTMLElement>('[data-share-copy-label]')
+    const original = label?.textContent ?? ''
+    copy.addEventListener('click', async () => {
+      let copied = false
+      // execCommand works inside the click gesture and does not depend on
+      // clipboard permissions; the async API is the fallback.
+      try {
+        const area = document.createElement('textarea')
+        area.value = url
+        area.setAttribute('readonly', '')
+        area.style.position = 'fixed'
+        area.style.opacity = '0'
+        document.body.appendChild(area)
+        area.select()
+        copied = document.execCommand('copy')
+        area.remove()
+      } catch {
+        copied = false
+      }
+      if (!copied) {
+        try {
+          await navigator.clipboard.writeText(url)
+          copied = true
+        } catch {
+          copied = false
+        }
+      }
+      if (!copied) {
+        window.prompt('', url)
+        return
+      }
+      if (label) {
+        label.textContent = copy.dataset.copiedLabel ?? original
+        window.setTimeout(() => {
+          label.textContent = original
+        }, 2200)
+      }
+      track('share_click', { platform: 'copy' })
+    })
+  }
+
+  const native = dialog.querySelector<HTMLButtonElement>('[data-share-native]')
+  if (native && navigator.share) {
+    native.hidden = false
+    native.addEventListener('click', async () => {
+      try {
+        await navigator.share({ title, url })
+        dialog.close()
+        track('share_click', { platform: 'native' })
+      } catch {
+        /* The visitor dismissed the native share sheet. */
+      }
+    })
+  }
 }
 
 function initTrackedLinks(): void {

@@ -207,6 +207,16 @@ export type Content = {
     fallback: string
     shareTitle: string
     shareBody: string
+    shareModalTitle: string
+    shareModalBody: string
+    shareWhatsApp: string
+    shareTelegram: string
+    shareFacebook: string
+    shareX: string
+    shareEmail: string
+    shareCopy: string
+    shareNative: string
+    shareClose: string
     yapeTitle: string
     yapeBody: string
     yapeCta: string
