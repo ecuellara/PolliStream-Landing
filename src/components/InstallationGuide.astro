@@ -1,0 +1,425 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import type { ProductMeta } from '../data/products'
+import { formatTemplate, getContent } from '../lib/i18n'
+
+interface Props {
+  locale: Locale
+  product: ProductMeta
+}
+
+const { locale, product } = Astro.props
+const t = getContent(locale)
+const copy = t.product.items[product.slug]
+const videoEmbedUrl = (value?: string): string | undefined => {
+  if (!value) return undefined
+
+  const source = new URL(value)
+  const host = source.hostname.toLowerCase()
+
+  if (source.protocol !== 'https:') {
+    throw new Error(`Tutorial video URL must use HTTPS for ${product.slug}.`)
+  }
+
+  if (host === 'youtu.be' || host === 'youtube.com' || host === 'www.youtube.com') {
+    const videoId =
+      host === 'youtu.be'
+        ? source.pathname.slice(1)
+        : source.searchParams.get('v') ?? source.pathname.match(/^\/(?:embed|shorts)\/([\w-]+)/)?.[1]
+
+    if (!videoId || !/^[\w-]{11}$/.test(videoId)) {
+      throw new Error(`Invalid YouTube tutorial URL for ${product.slug}.`)
+    }
+
+    return `https://www.youtube-nocookie.com/embed/${videoId}`
+  }
+
+  if ((host === 'facebook.com' || host === 'www.facebook.com') && source.pathname.includes('/videos/')) {
+    const embed = new URL('https://www.facebook.com/plugins/video.php')
+    embed.searchParams.set('href', source.toString())
+    embed.searchParams.set('show_text', 'false')
+    return embed.toString()
+  }
+
+  throw new Error(`Unsupported tutorial video URL for ${product.slug}.`)
+}
+
+const videoUrl = videoEmbedUrl(product.tutorialVideoUrl)
+const pairingScriptUrl = (() => {
+  if (!product.pairingScriptUrl) return undefined
+
+  const url = new URL(product.pairingScriptUrl)
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw new Error(`Pairing script URL must use HTTP or HTTPS for ${product.slug}.`)
+  }
+
+  return url.toString()
+})()
+---
+
+<section class="installation-guide" id="installation-guide" aria-labelledby="installation-guide-title">
+  <header class="installation-guide__head">
+    <p class="eyebrow">{t.download.tutorialKicker}</p>
+    <h2 class="section-title" id="installation-guide-title">
+      {formatTemplate(t.download.tutorialTitle, { platform: product.name })}
+    </h2>
+    <p class="section-lead">{t.download.tutorialBody}</p>
+  </header>
+
+  <div class="installation-guide__grid">
+    <div class="installation-guide__steps">
+      {copy.requirements.length > 0 && (
+        <div class="installation-prep">
+          <div class="installation-prep__intro">
+            <p class="eyebrow">{t.download.tutorialPrep}</p>
+            <p>{t.download.tutorialPrepBody}</p>
+          </div>
+          <ul class="installation-prep__list">
+            {copy.requirements.map((requirement) => (
+              <li>{requirement}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {copy.install.map((step) => (
+        <article class="installation-step">
+          <figure
+            class="installation-step__visual"
+            role="img"
+            aria-label={formatTemplate(t.download.tutorialImage, { step: step.index })}
+          >
+            <svg viewBox="0 0 280 160" aria-hidden="true" focusable="false">
+              <rect x="18" y="12" width="244" height="136" rx="12" fill="#0e1511" stroke="rgba(255,255,255,.16)" />
+              <path d="M18 42h244" stroke="rgba(255,255,255,.12)" />
+              <circle cx="34" cy="27" r="3" fill="#ff6b5e" />
+              <circle cx="46" cy="27" r="3" fill="#fbbf24" />
+              <circle cx="58" cy="27" r="3" fill="#c6ff3d" />
+              {step.index === '01' ? (
+                <>
+                  <path d="M140 61v38m-14-14 14 14 14-14" fill="none" stroke="#c6ff3d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M108 104h64v20h-64z" rx="5" fill="#121a15" stroke="rgba(198,255,61,.38)" />
+                  <path d="M121 114h38" stroke="#c6ff3d" stroke-width="3" stroke-linecap="round" />
+                </>
+              ) : step.index === '02' ? (
+                <>
+                  <rect x="78" y="57" width="124" height="60" rx="7" fill="#121a15" stroke="rgba(198,255,61,.38)" />
+                  <path d="m111 87 15 14 34-34" fill="none" stroke="#c6ff3d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M107 126h66" stroke="rgba(255,255,255,.24)" stroke-width="4" stroke-linecap="round" />
+                </>
+              ) : step.index === '03' ? (
+                <>
+                  <circle cx="104" cy="81" r="18" fill="#121a15" stroke="rgba(198,255,61,.45)" />
+                  <path d="M94 105c2-9 8-13 10-13s8 4 10 13" fill="none" stroke="#c6ff3d" stroke-width="3" stroke-linecap="round" />
+                  <path d="M143 72h52M143 88h42M143 104h48" stroke="rgba(255,255,255,.32)" stroke-width="5" stroke-linecap="round" />
+                </>
+              ) : step.index === '04' ? (
+                <>
+                  <circle cx="140" cy="82" r="20" fill="none" stroke="#c6ff3d" stroke-width="4" />
+                  <circle cx="140" cy="82" r="7" fill="#c6ff3d" />
+                  <path d="M140 48v10M140 106v10M106 82h10M164 82h10M116 58l7 7M157 99l7 7M164 58l-7 7M123 99l-7 7" stroke="rgba(198,255,61,.55)" stroke-width="3" stroke-linecap="round" />
+                </>
+              ) : (
+                <>
+                  <circle cx="140" cy="82" r="26" fill="#121a15" stroke="rgba(198,255,61,.45)" />
+                  <path d="m133 68 22 14-22 14z" fill="#c6ff3d" />
+                  <path d="M92 122h96" stroke="rgba(255,255,255,.24)" stroke-width="4" stroke-linecap="round" />
+                </>
+              )}
+            </svg>
+          </figure>
+          <div class="installation-step__copy">
+            <p class="eyebrow">{t.download.tutorialStep} {step.index}</p>
+            <h3>{step.title}</h3>
+            <p class="installation-step__body">{step.body}</p>
+            {step.details && step.details.length > 0 && (
+              <ul class="installation-step__details">
+                {step.details.map((detail) => (
+                  <li>{detail}</li>
+                ))}
+              </ul>
+            )}
+            {step.commands && step.commands.length > 0 && (
+              <pre class="installation-step__commands"><code>{step.commands.join('\n')}</code></pre>
+            )}
+          </div>
+        </article>
+      ))}
+      {copy.note && <p class="installation-guide__note">{copy.note}</p>}
+    </div>
+
+    <aside class="installation-video">
+      <h3>{t.download.tutorialVideo}</h3>
+      {videoUrl ? (
+        <iframe
+          src={videoUrl}
+          title={`${t.download.tutorialVideo} · ${product.name}`}
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      ) : (
+        <div class="installation-video__placeholder">
+          <Icon name="play" size={28} />
+          <p>{t.download.tutorialVideoSoon}</p>
+        </div>
+      )}
+      {pairingScriptUrl && (
+        <a
+          class="installation-video__script"
+          href={pairingScriptUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Icon name="download" size={14} />
+          {t.download.pairingScript}
+        </a>
+      )}
+    </aside>
+  </div>
+</section>
+
+<style>
+  .installation-guide {
+    padding: clamp(3rem, 7vw, 6rem) 0;
+  }
+
+  .installation-guide__head {
+    max-width: 760px;
+    margin-bottom: 28px;
+  }
+
+  .installation-guide__head .section-title {
+    margin: 0 0 14px;
+  }
+
+  .installation-guide__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.8fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .installation-guide__steps {
+    display: grid;
+    gap: 12px;
+  }
+
+  .installation-step {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.7fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    padding: 14px;
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-lg);
+    background: var(--color-panel);
+  }
+
+  .installation-step__visual {
+    margin: 0;
+  }
+
+  .installation-step__visual svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .installation-step__copy .eyebrow {
+    margin: 0 0 8px;
+  }
+
+  .installation-step__copy h3,
+  .installation-video h3 {
+    margin: 0 0 8px;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.15;
+  }
+
+  .installation-step__body,
+  .installation-guide__note,
+  .installation-video__placeholder p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  .installation-step__details {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .installation-step__details li {
+    position: relative;
+    padding-left: 16px;
+    color: var(--color-muted);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  .installation-step__details li::before {
+    content: '';
+    position: absolute;
+    top: 0.55em;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-lime);
+    opacity: 0.7;
+  }
+
+  .installation-step__commands {
+    margin: 12px 0 0;
+    padding: 12px 14px;
+    overflow-x: auto;
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-md);
+    background: #0a0f0c;
+  }
+
+  .installation-step__commands code {
+    color: var(--color-lime-soft);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .installation-prep {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 18px;
+    align-items: start;
+    padding: 18px;
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-lg);
+    background: var(--color-panel-2);
+  }
+
+  .installation-prep__intro .eyebrow {
+    margin: 0 0 8px;
+  }
+
+  .installation-prep__intro p:last-child {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.84rem;
+    line-height: 1.6;
+  }
+
+  .installation-prep__list {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .installation-prep__list li {
+    position: relative;
+    padding-left: 18px;
+    color: var(--color-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .installation-prep__list li::before {
+    content: '';
+    position: absolute;
+    top: 0.5em;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--color-lime);
+    border-radius: 2px;
+  }
+
+  .installation-guide__note {
+    padding: 14px 16px;
+    border-left: 2px solid var(--color-lime);
+    background: var(--color-white-05);
+  }
+
+  .installation-video {
+    position: sticky;
+    top: calc(var(--header-h) + 18px);
+    padding: 18px;
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-lg);
+    background: var(--color-panel);
+  }
+
+  .installation-video iframe,
+  .installation-video__placeholder {
+    display: grid;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-panel-2);
+  }
+
+  .installation-video__placeholder {
+    place-content: center;
+    justify-items: center;
+    gap: 12px;
+    padding: 18px;
+    color: var(--color-lime);
+    text-align: center;
+  }
+
+  .installation-video__placeholder p {
+    max-width: 34ch;
+    color: var(--color-muted);
+  }
+
+  .installation-video__script {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    color: var(--color-lime);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .installation-video__script:hover {
+    color: var(--color-lime-soft);
+  }
+
+  @media (max-width: 800px) {
+    .installation-guide__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .installation-prep {
+      grid-template-columns: 1fr;
+    }
+
+    .installation-video {
+      position: static;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .installation-step {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .installation-step__visual svg {
+      max-height: 150px;
+    }
+  }
+</style>

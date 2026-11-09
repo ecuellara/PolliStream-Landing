@@ -33,7 +33,7 @@ const classFor = (slug: string): string => {
           <span class="platform-card__icon">
             <Icon name={product.icon} size={24} />
           </span>
-          <span class="platform-card__index">{String(index + 1).padStart(2, '0')} / 05</span>
+          <span class="platform-card__index">{String(index + 1).padStart(2, '0')} / {String(products.length).padStart(2, '0')}</span>
         </div>
 
         <span class="platform-card__status" data-status={product.status}>

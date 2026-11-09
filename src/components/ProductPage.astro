@@ -4,7 +4,7 @@ import Icon from './Icon.astro'
 import DeviceDemo from './DeviceDemo.astro'
 import AdSlot from './AdSlot.astro'
 import type { Locale } from '../data/content/types'
-import type { ProductMeta } from '../data/products'
+import type { ProductMeta, ProductSlug } from '../data/products'
 import {
   alternatesForProduct,
   downloadPath,
@@ -31,16 +31,18 @@ const downloadHref = downloadPath(locale, product.slug)
 const isLive = product.status === 'live'
 const related = products.filter((item) => item.slug !== product.slug).slice(0, 3)
 
-const operatingSystem =
-  product.slug === 'lg'
-    ? 'LG webOS 4+'
-    : product.slug === 'samsung'
-      ? 'Samsung Tizen'
-      : product.slug === 'android'
-        ? 'Android'
-        : product.slug === 'android-tv'
-          ? 'Android TV, Fire TV'
-          : 'Windows'
+const operatingSystems: Record<ProductSlug, string> = {
+  lg: 'LG webOS 4+',
+  samsung: 'Samsung Tizen 3.0',
+  'samsung-modern': 'Samsung Tizen 6.5+',
+  android: 'Android',
+  'android-tv': 'Android TV, Fire TV',
+  windows: 'Windows',
+  roku: 'Roku OS',
+  macos: 'macOS',
+  ios: 'iOS, iPad',
+}
+const operatingSystem = operatingSystems[product.slug]
 
 const jsonLd = [
   {

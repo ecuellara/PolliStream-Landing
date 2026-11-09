@@ -39,7 +39,7 @@ Fonts are self-hosted from `src/assets/fonts/` (latin subset only) and declared 
 - Section rhythm: `clamp(4.5rem, 9vw, 8rem)` block padding; tight sections use `clamp(3rem, 6vw, 5rem)`.
 - Spacing follows a 4/8px base; cards breathe with 18–32px internal padding.
 - Desktop hero: two columns (copy / device stage). Under 1024px the copy becomes `display: contents` and the order is title → lead → actions → microcopy → device → stats, so the product appears earlier in the first mobile viewport.
-- Platform grid: 12 columns on desktop (LG 6, Samsung 6, Android/Android TV/Windows 4 each); 2 columns tablet; 1 column mobile.
+- Platform grid: 12 columns on desktop (LG 6, Samsung Legacy 6, other platforms 4 each); 2 columns tablet; 1 column mobile.
 
 ## Components
 
@@ -54,15 +54,16 @@ Fonts are self-hosted from `src/assets/fonts/` (latin subset only) and declared 
 
 ### Platform card
 
-A channel strip: icon tile, index `01 / 05`, status badge, platform label, product name, version/size/format telemetry, and a bottom CTA. Accent is set with `data-accent` and drives the icon, ring, status, and hover border through `color-mix`.
+A channel strip: icon tile, index `01 / 09`, status badge, platform label, product name, version/size/format telemetry, and a bottom CTA. Accent is set with `data-accent` and drives the icon, ring, status, and hover border through `color-mix`.
 
 ### Device stage
 
 An authored CSS/SVG player interface inside a TV, phone, or window frame. The platform picker changes `data-device` on the frame:
 
-- `lg`, `samsung`, `android-tv`: 16:9 TV frame.
-- `android`: 9:18.5 phone frame, sidebar/guide hidden.
-- `windows`: window chrome, no stand.
+- `lg`, both Samsung builds, `android-tv`, `roku`: 16:9 TV frame.
+- `android`, `ios`: 9:18.5 phone frame, sidebar/guide hidden.
+- `windows`, `macos`: window chrome, no stand.
+- macOS and iOS/iPad use generic Apple-platform device icons.
 
 The stage is labelled “VISTA PREVIA DE INTERFAZ · DATOS DE EJEMPLO” so it is never mistaken for a real screenshot. The visitor drives it; it does not auto-advance, so the page never shifts under them while they read.
 
@@ -81,6 +82,8 @@ A three-node diagram (provider → PolliStream → screen) on a bordered panel. 
 ### Download gate
 
 A focused card with product summary, a 3-second preparation bar, the final CTA, file metadata, and a security panel. The button is `aria-disabled` until ready. Without JavaScript the link remains usable. The final URL may be a direct installer or a CPA/locker URL; the page never hides the download or fakes a countdown.
+
+Available download pages also render the platform installation guide, illustrative step diagrams, and an optional YouTube/Facebook video. Video links are configured per platform; a future TV-pairing script can be linked through its optional configuration field.
 
 ### Ad slots
 

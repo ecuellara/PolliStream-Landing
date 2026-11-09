@@ -10,7 +10,7 @@ const repo = 'ecuellara/PolliStream-Downloads'
 const tag = 'downloads'
 const generatedPath = join(root, 'src', 'data', 'installers.generated.json')
 const installersDir = resolve(root, process.env.INSTALLERS_DIR ?? 'installers')
-const platforms = ['lg', 'samsung', 'android', 'windows']
+const platforms = ['lg', 'samsung', 'samsung-modern', 'android', 'android-tv', 'windows', 'roku', 'macos', 'ios']
 const dryRun = process.argv.includes('--dry-run')
 const gh = process.platform === 'win32' ? 'gh.exe' : 'gh'
 const generated = JSON.parse(readFileSync(generatedPath, 'utf8'))

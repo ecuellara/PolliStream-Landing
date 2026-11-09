@@ -1036,51 +1036,63 @@ hr {
   background: #111613;
 }
 
-.device[data-device='android'] {
+.device[data-device='android'],
+.device[data-device='ios'] {
   max-width: 246px;
 }
 
-.device[data-device='android'] .device-shell {
+.device[data-device='android'] .device-shell,
+.device[data-device='ios'] .device-shell {
   padding: 7px;
   border-radius: 30px;
 }
 
-.device[data-device='android'] .device-screen {
+.device[data-device='android'] .device-screen,
+.device[data-device='ios'] .device-screen {
   aspect-ratio: 9 / 18.5;
   border-radius: 24px;
 }
 
-.device[data-device='android'] .device-body {
+.device[data-device='android'] .device-body,
+.device[data-device='ios'] .device-body {
   grid-template-columns: 1fr;
 }
 
 .device[data-device='android'] .device-sidebar,
-.device[data-device='android'] .device-guide {
+.device[data-device='android'] .device-guide,
+.device[data-device='ios'] .device-sidebar,
+.device[data-device='ios'] .device-guide {
   display: none;
 }
 
-.device[data-device='android'] .device-main {
+.device[data-device='android'] .device-main,
+.device[data-device='ios'] .device-main {
   padding: 12px;
 }
 
-.device[data-device='android'] .device-main__title {
+.device[data-device='android'] .device-main__title,
+.device[data-device='ios'] .device-main__title {
   font-size: 1.35rem;
 }
 
-.device[data-device='android'] .device-stand {
+.device[data-device='android'] .device-stand,
+.device[data-device='ios'] .device-stand {
   display: none;
 }
 
-.device[data-device='android'] .device-topbar {
+.device[data-device='android'] .device-topbar,
+.device[data-device='ios'] .device-topbar {
   height: 30px;
   padding-top: 4px;
 }
 
-.device[data-device='windows'] .device-shell {
+.device[data-device='windows'] .device-shell,
+.device[data-device='macos'] .device-shell {
   padding-top: 28px;
 }
 
-.device[data-device='windows'] .device-shell::before {
+.device[data-device='windows'] .device-shell::before,
+.device[data-device='macos'] .device-shell::before {
   content: 'POLLISTREAM  —  VENTANA PRINCIPAL';
   position: absolute;
   top: 0;
@@ -1095,7 +1107,8 @@ hr {
   letter-spacing: 0.1em;
 }
 
-.device[data-device='windows'] .device-stand {
+.device[data-device='windows'] .device-stand,
+.device[data-device='macos'] .device-stand {
   display: none;
 }
 

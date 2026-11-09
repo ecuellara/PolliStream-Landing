@@ -76,9 +76,13 @@ const result = {}
 const platforms = [
   { slug: 'lg', extensions: ['.ipk'] },
   { slug: 'samsung', extensions: ['.wgt'] },
+  { slug: 'samsung-modern', extensions: ['.wgt'] },
   { slug: 'android', extensions: ['.apk'] },
   { slug: 'android-tv', extensions: ['.apk'] },
   { slug: 'windows', extensions: ['.exe'] },
+  { slug: 'roku', extensions: ['.zip'] },
+  { slug: 'macos', extensions: ['.dmg', '.pkg'] },
+  { slug: 'ios', extensions: ['.ipa'] },
 ]
 
 for (const { slug, extensions } of platforms) {

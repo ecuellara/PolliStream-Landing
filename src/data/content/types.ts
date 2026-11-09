@@ -21,6 +21,10 @@ export type Step = {
   index: string
   title: string
   body: string
+  /** Optional checklist with the full detail for this step. */
+  details?: string[]
+  /** Optional terminal commands shown in a code block. */
+  commands?: string[]
 }
 
 export type ProductCopy = {
@@ -181,6 +185,16 @@ export type Content = {
     whatsNext: string
     whatsNextBody: string
     openInstaller: string
+    tutorialKicker: string
+    tutorialTitle: string
+    tutorialBody: string
+    tutorialPrep: string
+    tutorialPrepBody: string
+    tutorialStep: string
+    tutorialImage: string
+    tutorialVideo: string
+    tutorialVideoSoon: string
+    pairingScript: string
   }
   support: {
     kicker: string

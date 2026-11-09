@@ -1,7 +1,17 @@
 import { site } from './site'
 import generated from './installers.generated.json'
 
-export const productSlugs = ['lg', 'samsung', 'android', 'android-tv', 'windows'] as const
+export const productSlugs = [
+  'lg',
+  'samsung',
+  'samsung-modern',
+  'android',
+  'android-tv',
+  'windows',
+  'roku',
+  'macos',
+  'ios',
+] as const
 export type ProductSlug = (typeof productSlugs)[number]
 export type ProductStatus = 'live' | 'soon'
 export type DownloadMode = 'direct' | 'locker' | 'soon'
@@ -25,6 +35,10 @@ export type DownloadConfig = {
   lockerUrl?: string
   /** GitHub release page, used when there is no direct asset URL. */
   githubUrl?: string
+  /** Optional YouTube or Facebook video URL for the platform installation guide. */
+  tutorialVideoUrl?: string
+  /** Optional public URL for a future TV-pairing script. */
+  pairingScriptUrl?: string
   /** File name inside PUBLIC_R2_BASE_URL, e.g. "lg/pollistream-lg-1.0.4.ipk". */
   r2Key?: string
   fileName?: string
@@ -47,11 +61,15 @@ export const downloadConfig: Record<ProductSlug, DownloadConfig> = {
       'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-lg.ipk',
     updated: '2026-10',
     fileName: 'pollistream-lg.ipk',
+    tutorialVideoUrl: 'https://www.facebook.com/61583684859011/videos/pcb.1855460372556026/1878130016941448',
   },
   samsung: {
     githubUrl:
       'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-samsung.wgt',
     fileName: 'pollistream-samsung.wgt',
+  },
+  'samsung-modern': {
+    fileName: 'pollistream-samsung-modern.wgt',
   },
   android: {
     githubUrl:
@@ -60,6 +78,13 @@ export const downloadConfig: Record<ProductSlug, DownloadConfig> = {
   },
   'android-tv': {
     fileName: 'pollistream-androidtv.apk',
+  },
+  roku: {
+    fileName: 'pollistream-roku.zip',
+  },
+  macos: {
+  },
+  ios: {
   },
   windows: {
     githubUrl:
@@ -75,7 +100,7 @@ export type ProductMeta = {
   platform: string
   family: 'tv' | 'mobile' | 'desktop'
   fileType: string
-  icon: 'lg' | 'samsung' | 'android' | 'android-tv' | 'windows'
+  icon: 'lg' | 'samsung' | 'android' | 'android-tv' | 'windows' | 'roku' | 'apple'
   accent: 'lime' | 'cyan' | 'blue' | 'violet' | 'amber'
   order: number
   featured?: boolean
@@ -87,6 +112,8 @@ export type ProductMeta = {
   updated: string
   sha256: string
   fileName: string
+  tutorialVideoUrl?: string
+  pairingScriptUrl?: string
 }
 
 const base: Record<
@@ -105,14 +132,24 @@ const base: Record<
     featured: true,
   },
   samsung: {
-    name: 'Samsung Tizen',
-    shortName: 'Samsung',
+    name: 'Samsung Tizen Legacy',
+    shortName: 'Samsung Legacy',
     platform: 'Smart TV',
     family: 'tv',
     fileType: 'WGT / TPK',
     icon: 'samsung',
     accent: 'blue',
     order: 2,
+  },
+  'samsung-modern': {
+    name: 'Samsung Tizen moderno',
+    shortName: 'Samsung Tizen',
+    platform: 'Smart TV · Tizen 6.5+',
+    family: 'tv',
+    fileType: 'WGT',
+    icon: 'samsung',
+    accent: 'cyan',
+    order: 3,
   },
   android: {
     name: 'Android',
@@ -122,7 +159,7 @@ const base: Record<
     fileType: 'APK',
     icon: 'android',
     accent: 'lime',
-    order: 3,
+    order: 4,
   },
   'android-tv': {
     name: 'Android TV / Fire TV',
@@ -132,7 +169,7 @@ const base: Record<
     fileType: 'APK',
     icon: 'android-tv',
     accent: 'cyan',
-    order: 4,
+    order: 5,
   },
   windows: {
     name: 'Windows',
@@ -142,7 +179,37 @@ const base: Record<
     fileType: 'EXE',
     icon: 'windows',
     accent: 'violet',
-    order: 5,
+    order: 6,
+  },
+  roku: {
+    name: 'Roku',
+    shortName: 'Roku',
+    platform: 'Streaming player',
+    family: 'tv',
+    fileType: 'ZIP',
+    icon: 'roku',
+    accent: 'amber',
+    order: 7,
+  },
+  macos: {
+    name: 'macOS',
+    shortName: 'Mac',
+    platform: 'Escritorio',
+    family: 'desktop',
+    fileType: 'DMG / PKG',
+    icon: 'apple',
+    accent: 'violet',
+    order: 8,
+  },
+  ios: {
+    name: 'iPhone y iPad',
+    shortName: 'iOS / iPad',
+    platform: 'Móvil y tablet',
+    family: 'mobile',
+    fileType: 'App Store / IPA',
+    icon: 'apple',
+    accent: 'lime',
+    order: 9,
   },
 }
 
@@ -178,6 +245,8 @@ export const products: ProductMeta[] = productSlugs
       updated: config.updated ?? '',
       sha256: config.sha256 ?? local?.sha256 ?? '',
       fileName: config.fileName ?? local?.fileName ?? '',
+      tutorialVideoUrl: config.tutorialVideoUrl,
+      pairingScriptUrl: config.pairingScriptUrl,
     }
   })
   .sort((a, b) => a.order - b.order)

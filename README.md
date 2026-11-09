@@ -30,7 +30,7 @@ npm run check     # Astro + TypeScript
 | Qué | Archivo |
 |---|---|
 | Dominio, email de contacto, analytics | `src/data/site.ts` + `.env` |
-| Versiones, tamaños y URLs de descarga | `src/data/products.ts` |
+| Versiones, tamaños, URLs, videos y script opcional de vinculación | `src/data/products.ts` |
 | Anuncios (AdSense / Adsterra / custom) | `src/data/ads.ts` |
 | Donaciones / Ko-fi / PayPal | `src/data/site.ts` (`support.links`) |
 | Afiliados IPTV | `src/data/site.ts` (`affiliate.links`) |
@@ -65,9 +65,11 @@ Deja los binarios en `installers/<plataforma>/` y ejecuta:
 npm run github:upload
 ```
 
-El comando sincroniza los archivos y los crea o actualiza como assets de la release de GitHub. Requiere `gh` instalado y autenticado con permiso de escritura en el repositorio público. Samsung usa `.wgt`, Android y Android TV `.apk`, Windows `.exe` y LG `.ipk`.
+El comando sincroniza los archivos y los crea o actualiza como assets de la release de GitHub. Requiere `gh` instalado y autenticado con permiso de escritura en el repositorio público. Samsung Legacy y Samsung moderno usan `.wgt`, Android y Android TV `.apk`, Windows `.exe`, LG `.ipk`, Roku `.zip`, macOS `.dmg`/`.pkg` e iOS/iPad `.ipa` cuando exista una distribución válida.
 
-Los nombres públicos son `pollistream-lg.ipk`, `pollistream-samsung.wgt`, `pollistream-android.apk` y `pollistream-windows.exe`. Si reemplazas un instalador, vuelve a ejecutar el comando. Android TV solo aparecerá disponible cuando haya un APK en su carpeta y se haya publicado.
+Los nombres públicos siguen el formato `pollistream-<plataforma>.<extensión>` (por ejemplo, `pollistream-lg.ipk` y `pollistream-samsung-modern.wgt`). `/samsung/` conserva el paquete Legacy para Tizen 3.0; la versión moderna tiene una ficha separada y seguirá como «Próximamente» hasta publicar su build. Roku, macOS e iOS/iPad también permanecen pendientes hasta contar con paquetes probados.
+
+Cada descarga disponible incluye una guía con pasos e ilustraciones. Configura `tutorialVideoUrl` en `src/data/products.ts` para añadir un video de YouTube o Facebook. El campo opcional `pairingScriptUrl` permitirá enlazar el script de vinculación del televisor cuando esté publicado.
 
 ## Monetización
 
