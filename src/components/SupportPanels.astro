@@ -1,8 +1,10 @@
 ---
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import Icon from './Icon.astro'
 import type { Locale } from '../data/content/types'
 import { getContent, homePath } from '../lib/i18n'
-import { affiliate, site, support } from '../data/site'
+import { affiliate, paypalDonateUrl, site, support } from '../data/site'
 
 interface Props {
   locale: Locale
@@ -11,68 +13,161 @@ interface Props {
 const { locale } = Astro.props
 const t = getContent(locale)
 const shareUrl = `${site.url}${homePath(locale)}`
-const hasSupport = support.links.length > 0
 const hasAffiliate = affiliate.enabled && affiliate.links.length > 0
+
+// The card is disabled until the real QR is present in public/donate/.
+const qrMissing = !existsSync(join(process.cwd(), 'public', support.yape.qrPath))
+const yapeReady = support.yape.enabled && !qrMissing
+const paypalUrl = paypalDonateUrl()
 ---
 
 <section class="section section--tight container-page" id="support">
-  <div class="split-panels" data-reveal>
-    <article class="callout">
-      <p class="eyebrow">{t.support.kicker}</p>
-      <h2 class="callout__title">{t.support.title}</h2>
-      <p class="callout__body">{t.support.body}</p>
+  <header class="support-head" data-reveal>
+    <p class="eyebrow">{t.support.kicker}</p>
+    <h2 class="callout__title">{t.support.title}</h2>
+    <p class="callout__body">{t.support.body}</p>
+  </header>
 
-      <div class="callout__actions">
-        {hasSupport ? (
-          support.links.map((link) => (
-            <a class="btn btn-primary btn-sm" href={link.url} target="_blank" rel="noopener">
-              <Icon name="coffee" size={14} />
-              {link.label}
-            </a>
-          ))
-        ) : (
-          <button
-            class="btn btn-primary btn-sm"
-            type="button"
-            data-share
-            data-share-url={shareUrl}
-            data-share-title="PolliStream"
-            data-share-label={t.support.share}
-            data-copied-label={t.support.copied}
-          >
-            <Icon name="share" size={14} />
-            {t.support.share}
-          </button>
-        )}
-      </div>
-
-      {!hasSupport && <p class="callout__note">{t.support.fallback}</p>}
+  <div class="support-cards" data-reveal>
+    <article class="support-card">
+      <span class="support-card__icon"><Icon name="share" size={22} /></span>
+      <h3 class="support-card__title">{t.support.shareTitle}</h3>
+      <p class="support-card__body">{t.support.shareBody}</p>
+      <button
+        class="btn btn-secondary btn-sm"
+        type="button"
+        data-share
+        data-share-url={shareUrl}
+        data-share-title="PolliStream"
+        data-share-label={t.support.share}
+        data-copied-label={t.support.copied}
+      >
+        <Icon name="share" size={14} />
+        {t.support.share}
+      </button>
     </article>
 
-    {hasAffiliate && (
-      <article class="callout callout--affiliate">
-        <p class="eyebrow">{t.affiliate.kicker}</p>
-        <h2 class="callout__title">{t.affiliate.title}</h2>
-        <p class="callout__body">{t.affiliate.body}</p>
+    <article class="support-card support-card--yape" data-disabled={yapeReady ? undefined : 'true'}>
+      <span class="support-card__icon"><Icon name="yape" size={22} /></span>
+      <h3 class="support-card__title">{t.support.yapeTitle}</h3>
+      <p class="support-card__body">{t.support.yapeBody}</p>
+      {yapeReady ? (
+        <button class="btn btn-primary btn-sm" type="button" data-donate-open="yape">
+          <Icon name="qr" size={14} />
+          {t.support.yapeCta}
+        </button>
+      ) : (
+        <p class="support-card__pending">{t.support.yapePending}</p>
+      )}
+    </article>
 
-        <div class="callout__actions">
-          {affiliate.links.map((link) => (
-            <a
-              class="btn btn-secondary btn-sm"
-              href={link.url}
-              target="_blank"
-              rel="sponsored noopener"
-              data-track="affiliate_click"
-              data-track-label={link.name}
-            >
-              {link.name}
-              <Icon name="arrow-up-right" size={14} />
-            </a>
-          ))}
+    <article class="support-card support-card--paypal" data-disabled={support.paypal.enabled ? undefined : 'true'}>
+      <span class="support-card__icon"><Icon name="paypal" size={22} /></span>
+      <h3 class="support-card__title">{t.support.paypalTitle}</h3>
+      <p class="support-card__body">{t.support.paypalBody}</p>
+      {support.paypal.enabled ? (
+        <a
+          class="btn btn-secondary btn-sm"
+          href={paypalUrl}
+          target="_blank"
+          rel="noopener"
+          data-track="donate_click"
+          data-track-platform="paypal"
+        >
+          <Icon name="arrow-up-right" size={14} />
+          {t.support.paypalCta}
+        </a>
+      ) : (
+        <p class="support-card__pending">{t.support.yapePending}</p>
+      )}
+      {support.paypal.handle && (
+        <p class="support-card__meta">paypal.me/{support.paypal.handle}</p>
+      )}
+    </article>
+  </div>
+
+  {hasAffiliate && (
+    <article class="callout callout--affiliate support-affiliate">
+      <p class="eyebrow">{t.affiliate.kicker}</p>
+      <h2 class="callout__title">{t.affiliate.title}</h2>
+      <p class="callout__body">{t.affiliate.body}</p>
+
+      <div class="callout__actions">
+        {affiliate.links.map((link) => (
+          <a
+            class="btn btn-secondary btn-sm"
+            href={link.url}
+            target="_blank"
+            rel="sponsored noopener"
+            data-track="affiliate_click"
+            data-track-label={link.name}
+          >
+            {link.name}
+            <Icon name="arrow-up-right" size={14} />
+          </a>
+        ))}
+      </div>
+
+      <p class="callout__note">{t.affiliate.disclosure}</p>
+    </article>
+  )}
+
+  {yapeReady && (
+    <dialog class="donate-modal" data-donate-modal="yape" aria-labelledby="yape-modal-title">
+      <div class="donate-modal__panel">
+        <button
+          class="donate-modal__close"
+          type="button"
+          data-donate-close
+          aria-label={t.support.yapeClose}
+        >
+          <Icon name="close" size={18} />
+        </button>
+
+        <p class="eyebrow">{t.support.yapeTitle}</p>
+        <h2 class="donate-modal__title" id="yape-modal-title">{t.support.yapeModalTitle}</h2>
+        <p class="donate-modal__lead">{t.support.yapeModalBody}</p>
+
+        <div class="donate-modal__body">
+          <div class="donate-qr">
+            <img
+              src={support.yape.qrPath}
+              alt={`QR Yape · PolliStream`}
+              width="280"
+              height="280"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+
+          <ol class="donate-steps">
+            {t.support.yapeSteps.map((step) => <li>{step}</li>)}
+          </ol>
         </div>
 
-        <p class="callout__note">{t.affiliate.disclosure}</p>
-      </article>
-    )}
-  </div>
+        {support.yape.holder && (
+          <p class="donate-modal__holder">
+            <span>{t.support.yapeTitle}</span>
+            <strong>{support.yape.holder}</strong>
+          </p>
+        )}
+
+        <div class="donate-modal__actions">
+          <a
+            class="btn btn-primary"
+            href={support.yape.qrPath}
+            download={support.yape.qrFileName}
+            data-track="donate_qr_download"
+            data-track-platform="yape"
+          >
+            <Icon name="download" size={16} />
+            {t.support.yapeDownload}
+          </a>
+          <button class="btn btn-ghost" type="button" data-donate-close>
+            {t.support.yapeClose}
+          </button>
+        </div>
+      </div>
+    </dialog>
+  )}
 </section>

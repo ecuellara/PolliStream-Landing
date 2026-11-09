@@ -77,7 +77,9 @@ export const downloadConfig: Record<ProductSlug, DownloadConfig> = {
     fileName: 'pollistream-android.apk',
   },
   'android-tv': {
-    fileName: 'pollistream-androidtv.apk',
+    githubUrl:
+      'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-android-tv.apk',
+    fileName: 'pollistream-android-tv.apk',
   },
   roku: {
     fileName: 'pollistream-roku.zip',

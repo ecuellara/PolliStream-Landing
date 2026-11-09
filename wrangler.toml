@@ -1,3 +1,10 @@
 name = "pollistream"
 compatibility_date = "2026-11-01"
 pages_build_output_dir = "dist"
+
+# Aggregate, cookieless counters for download intent and clicks.
+# Created with: npx wrangler d1 create pollistream_stats
+[[d1_databases]]
+binding = "DB"
+database_name = "pollistream_stats"
+database_id = "cd6d9210-952b-4ff0-921d-9a1ffe615cdc"

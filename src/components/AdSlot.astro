@@ -2,7 +2,7 @@
 import Icon from './Icon.astro'
 import type { Locale } from '../data/content/types'
 import type { AdSlotName } from '../data/ads'
-import { ads, adSlotId } from '../data/ads'
+import { ads, adSlotId, adSlotHeight } from '../data/ads'
 import { getContent } from '../lib/i18n'
 import { site } from '../data/site'
 
@@ -16,14 +16,18 @@ interface Props {
 const { locale, slot, format = 'auto', class: className = '' } = Astro.props
 const t = getContent(locale)
 const adsenseSlot = adSlotId(slot)
+const height = adSlotHeight(slot)
 const configured =
   (ads.provider === 'adsense' && ads.adsense.client !== '' && adsenseSlot !== '') ||
   (ads.provider === 'adsterra' && ads.adsterra.key !== '') ||
   (ads.provider === 'custom' && ads.custom.html.trim() !== '')
 const sponsorHref = site.contactEmail ? `mailto:${site.contactEmail}?subject=PolliStream%20sponsor` : ''
+// With a network selected, an unconfigured slot stays invisible instead of
+// showing an empty dashed box. Placeholders are only for the "no network" case.
+const showPlaceholder = ads.showPlaceholders && ads.provider === 'none'
 ---
 
-{ads.enabled && (ads.showPlaceholders || configured) && (
+{ads.enabled && (configured || showPlaceholder) && (
   <aside
     class={`ad-slot ${className}`}
     data-format={format}
@@ -31,12 +35,15 @@ const sponsorHref = site.contactEmail ? `mailto:${site.contactEmail}?subject=Pol
     data-ad-provider={ads.provider}
     data-ad-configured={configured ? 'true' : 'false'}
     data-ad-consent-required={ads.requireConsent ? 'true' : 'false'}
+    data-ad-auto-ads={ads.autoAds ? 'true' : 'false'}
+    data-ad-height={height}
     data-adsense-client={ads.adsense.client}
     data-adsense-slot={adsenseSlot}
     data-adsterra-key={ads.adsterra.key}
     data-adsterra-width={ads.adsterra.width}
     data-adsterra-height={ads.adsterra.height}
     data-adsterra-script={ads.adsterra.scriptSrc}
+    style={`--ad-height: ${height}px`}
     aria-label={t.common.adLabel}
   >
     <span class="ad-slot__label">{t.common.adLabel}</span>

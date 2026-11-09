@@ -6,6 +6,7 @@ import ConsentBanner from './ConsentBanner.astro'
 import type { Locale } from '../data/content/types'
 import { htmlLang, ogLocale, locales, getContent } from '../lib/i18n'
 import { site } from '../data/site'
+import { ads } from '../data/ads'
 import interFont from '../assets/fonts/inter-latin.woff2?url'
 import bricolageFont from '../assets/fonts/bricolage-latin.woff2?url'
 import monoFont from '../assets/fonts/jetbrains-mono-latin.woff2?url'
@@ -84,6 +85,7 @@ const jsonLdItems = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
 
     <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
     <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+    {ads.adsense.client && <meta name="google-adsense-account" content={ads.adsense.client} />}
 
     <script is:inline>
       document.documentElement.classList.add('js')

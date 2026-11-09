@@ -9,3 +9,4 @@ src/data/installers.generated.json
 installers/*
 !installers/README.md
 .impeccable/
+.wrangler/

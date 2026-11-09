@@ -102,6 +102,10 @@ const backHref = productPath(locale, product.slug)
             <dt>{copy.size}</dt>
             <dd>{product.size}</dd>
           </div>
+          <div class="download-spec" data-download-count={product.slug} hidden>
+            <dt>{t.common.downloads}</dt>
+            <dd><span data-download-count-value>0</span></dd>
+          </div>
           <div class="download-spec">
             <dt>{copy.format}</dt>
             <dd>{product.fileType}</dd>

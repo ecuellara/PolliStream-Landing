@@ -37,6 +37,62 @@ function track(name: string, props: Record<string, string | number> = {}): void 
   } catch {
     /* Analytics must never break the page. */
   }
+
+  try {
+    // Aggregate counters live in Cloudflare D1 via Pages Functions. The payload
+    // carries no cookies or identifiers; the worker classifies the device from
+    // the request user agent.
+    const payload = JSON.stringify({
+      event: name,
+      platform: String(props.platform ?? props.product ?? 'site'),
+      mode: String(props.mode ?? ''),
+      locale: document.documentElement.lang || '',
+    })
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }))
+    } else {
+      void fetch('/api/track', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: payload,
+        keepalive: true,
+      }).catch(() => undefined)
+    }
+  } catch {
+    /* Blocked beacons must never break the page. */
+  }
+}
+
+function formatCount(value: number): string {
+  try {
+    return new Intl.NumberFormat(document.documentElement.lang || undefined).format(value)
+  } catch {
+    return String(value)
+  }
+}
+
+async function initDownloadCounters(): Promise<void> {
+  const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-download-count]'))
+  if (nodes.length === 0) return
+
+  try {
+    const response = await fetch('/api/stats', { headers: { accept: 'application/json' } })
+    if (!response.ok) return
+    const data = (await response.json()) as { downloads?: Record<string, number> }
+    const downloads = data.downloads ?? {}
+    const total = Object.values(downloads).reduce((sum, value) => sum + (Number(value) || 0), 0)
+
+    for (const node of nodes) {
+      const slug = node.dataset.downloadCount ?? ''
+      const value = slug === 'all' ? total : Number(downloads[slug] ?? 0)
+      if (!value || value <= 0) continue
+      const target = node.querySelector<HTMLElement>('[data-download-count-value]')
+      if (target) target.textContent = formatCount(value)
+      node.hidden = false
+    }
+  } catch {
+    /* Counters are progressive enhancement; the page works without them. */
+  }
 }
 
 function initMenu(): void {
@@ -135,6 +191,11 @@ function initPlatformPicker(): void {
     button.addEventListener('pointerenter', () => preloadScreen(screen))
     button.addEventListener('focus', () => preloadScreen(screen))
   })
+
+  // The mockup CTA points at the selected platform's download page.
+  link?.addEventListener('click', () => {
+    track('download_intent', { platform: device.dataset.device ?? '' })
+  })
 }
 
 function initShare(): void {
@@ -177,7 +238,36 @@ function initTrackedLinks(): void {
     element.addEventListener('click', () => {
       const name = element.dataset.track ?? 'click'
       const label = element.dataset.trackLabel ?? ''
-      track(name, label ? { label } : {})
+      const platform = element.dataset.trackPlatform ?? ''
+      track(name, {
+        ...(label ? { label } : {}),
+        ...(platform ? { platform } : {}),
+      })
+    })
+  })
+}
+
+function initDonationModals(): void {
+  const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>('[data-donate-modal]'))
+  if (dialogs.length === 0) return
+
+  document.querySelectorAll<HTMLElement>('[data-donate-open]').forEach((opener) => {
+    opener.addEventListener('click', () => {
+      const target = opener.dataset.donateOpen ?? ''
+      const dialog = dialogs.find((item) => item.dataset.donateModal === target)
+      if (!dialog) return
+      dialog.showModal()
+      track('donate_click', { platform: target || 'yape' })
+    })
+  })
+
+  dialogs.forEach((dialog) => {
+    dialog.querySelectorAll('[data-donate-close]').forEach((button) => {
+      button.addEventListener('click', () => dialog.close())
+    })
+    // A click on the backdrop (the dialog element itself) closes the modal.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close()
     })
   })
 }
@@ -294,9 +384,12 @@ async function initAds(): Promise<void> {
       if (!client || !adSlot) continue
       try {
         await loadAdSense(client)
+        const height = Number(slot.dataset.adHeight ?? 0)
         const ins = document.createElement('ins')
         ins.className = 'adsbygoogle'
         ins.style.display = 'block'
+        ins.style.width = '100%'
+        if (height > 0) ins.style.minHeight = `${height}px`
         ins.dataset.adClient = client
         ins.dataset.adSlot = adSlot
         ins.dataset.adFormat = 'auto'
@@ -402,8 +495,10 @@ function init(): void {
   initPlatformPicker()
   initShare()
   initTrackedLinks()
+  initDonationModals()
   initDownloadGate()
   initConsent()
+  void initDownloadCounters()
 }
 
 if (document.readyState === 'loading') {

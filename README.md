@@ -31,8 +31,8 @@ npm run check     # Astro + TypeScript
 |---|---|
 | Dominio, email de contacto, analytics | `src/data/site.ts` + `.env` |
 | Versiones, tamaños, URLs, videos y script opcional de vinculación | `src/data/products.ts` |
-| Anuncios (AdSense / Adsterra / custom) | `src/data/ads.ts` |
-| Donaciones / Ko-fi / PayPal | `src/data/site.ts` (`support.links`) |
+| Anuncios (AdSense / Adsterra / custom) | `src/data/ads.ts` + `.env` |
+| Donaciones (Compartir / Yape / PayPal) | `src/data/site.ts` (`support`) |
 | Afiliados IPTV | `src/data/site.ts` (`affiliate.links`) |
 | Copy ES / EN / PT | `src/data/content/*.ts` |
 | Cabeceras y caché de Cloudflare | `public/_headers` |
@@ -82,16 +82,18 @@ Hay slots en home, ficha de producto y página de descarga. El componente `AdSlo
 ```ts
 provider: 'adsense',
 adsense: {
-  client: 'ca-pub-XXXXXXXXXXXXXXXX',
+  client: 'ca-pub-7102655397941820',
   slots: {
     'home-top': '',
-    'home-mid': '1234567890',
-    product: '1234567890',
-    download: '1234567890',
+    'home-mid': '',
+    product: '',
+    download: '',
     legal: '',
   },
 }
 ```
+
+La cuenta ya está conectada (`ca-pub-7102655397941820`). Solo faltan los IDs de las unidades: crea en AdSense una unidad **Display** (horizontal para `home-*`, rectángulo para `product`/`download`) y pega su `data-ad-slot` en el slot correspondiente o en las variables `PUBLIC_ADSENSE_SLOT_*`. Un slot sin ID no renderiza nada (ni caja vacía).
 
 **Adsterra**:
 
@@ -108,6 +110,10 @@ custom: { html: `<!-- pega aquí el snippet de tu red -->` },
 ```
 
 Los scripts de anuncios **solo se cargan después de aceptar el aviso de cookies**. Si no hay red configurada, el aviso no aparece. Esto es intencionado: no pedir consentimiento para anuncios que no existen.
+
+> **Importante:** desactiva **Anuncios automáticos** (Auto ads) en AdSense. Con Auto ads activo, Google inserta unidades donde quiere, incluidas secciones sin slot; eso es exactamente lo que hace aparecer publicidad fuera de las zonas definidas. Con Auto ads apagado solo se renderizan los bloques declarados: `home-top`, `home-mid`, `product`, `download` y `legal`. Cada slot reserva su altura (`adsense.heights` en `src/data/ads.ts`) para no mover el layout cuando llega el anuncio.
+
+También puedes configurar todo con variables de entorno (ver `.env.example`): `PUBLIC_ADS_PROVIDER`, `PUBLIC_ADSENSE_CLIENT` y `PUBLIC_ADSENSE_SLOT_HOME_TOP`, `..._HOME_MID`, `..._PRODUCT`, `..._DOWNLOAD`, `..._LEGAL`.
 
 Si usas AdSense, añade también `public/ads.txt` con tu línea de vendedor autorizado:
 
@@ -131,21 +137,15 @@ Pon la URL del locker en `lockerUrl`. El flujo queda así:
 
 El botón directo sigue disponible si no configuras locker. No se oculta la descarga ni se usan botones falsos.
 
-### 3. Donaciones / premium
+### 3. Donaciones
 
-Añade enlaces reales en `src/data/site.ts`:
+La sección `#support` muestra tres tarjetas: **Compartir**, **Yape** y **PayPal**.
 
-```ts
-export const support = {
-  enabled: true,
-  links: [
-    { label: 'Ko-fi', url: 'https://ko-fi.com/tu-usuario' },
-    { label: 'PayPal', url: 'https://paypal.me/tu-usuario' },
-  ],
-}
-```
+- **Yape**: guarda el QR en `public/donate/yape-qr.png` (PNG cuadrado, mínimo 600×600). La tarjeta se activa sola cuando el archivo existe; si falta, muestra un aviso y nunca abre un QR roto. El modal permite escanear el código y descargar la imagen para usarla desde otro dispositivo.
+- **PayPal**: el enlace usa `paypal.com/donate` con el correo configurado, así que no necesitas un usuario `paypal.me`. Si creas uno, define `handle` en `src/data/site.ts` y el enlace pasará a `paypal.me/<handle>`.
+- **Compartir**: usa Web Share API y, si el navegador no la soporta, copia el enlace.
 
-Si `links` está vacío, la sección muestra un botón para compartir el sitio en lugar de un enlace de donación roto.
+Todo se configura en `src/data/site.ts` (`support.yape` y `support.paypal`). Deja `holder` vacío para ocultar el nombre del beneficiario junto al QR.
 
 ### 4. Afiliados IPTV
 
@@ -207,11 +207,28 @@ Secrets/vars necesarios en GitHub:
 4. Actualiza `public/robots.txt` no: se genera desde `src/pages/robots.txt.ts` con `SITE_URL`.
 5. Envía `https://tudominio.com/sitemap.xml` en Search Console.
 
-## Analítica
+## Analítica y contador de descargas
 
-- **Cloudflare Web Analytics**: crea el beacon en el dashboard y pon el token en `PUBLIC_CF_BEACON_TOKEN`. Es cookieless.
-- **Plausible** (opcional): `PUBLIC_PLAUSIBLE_DOMAIN=pollistream.com`.
-- Eventos personalizados: `download_view`, `download_click`, `platform_select`, `consent_ads`, `consent_essential`, `share_click`, `affiliate_click`.
+El sitio incluye contadores propios en Cloudflare D1, sin cookies ni identificadores personales.
+
+- **Endpoints**: `POST /api/track` registra eventos agregados por día, plataforma, dispositivo e idioma. `GET /api/stats` devuelve los totales y el número real de descargas de GitHub Releases.
+- **Dispositivo**: se deduce del `User-Agent` (`tv`, `mobile`, `tablet`, `desktop`); los bots se descartan.
+- **Contador visible**: cada tarjeta de plataforma y cada ficha de descarga muestra las descargas reales del asset de GitHub. Si la API de GitHub no responde en 3 s, se usa el número de clics registrado en D1.
+- **Base de datos**: `pollistream_stats`, binding `DB` en `wrangler.toml`. La tabla se crea con:
+
+```sh
+npx wrangler d1 execute pollistream_stats --remote --command "CREATE TABLE IF NOT EXISTS events (day TEXT NOT NULL, event TEXT NOT NULL, platform TEXT NOT NULL, mode TEXT NOT NULL DEFAULT '', device TEXT NOT NULL DEFAULT '', locale TEXT NOT NULL DEFAULT '', count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, event, platform, mode, device, locale))"
+```
+
+- **Consultas útiles**:
+
+```sh
+npx wrangler d1 execute pollistream_stats --remote --command "SELECT platform, event, SUM(count) total FROM events GROUP BY platform, event ORDER BY total DESC"
+npx wrangler d1 execute pollistream_stats --remote --command "SELECT device, SUM(count) total FROM events WHERE event='download_click' GROUP BY device"
+```
+
+- **Proveedores externos** (opcional): `PUBLIC_CF_BEACON_TOKEN` para Cloudflare Web Analytics y `PUBLIC_PLAUSIBLE_DOMAIN` para Plausible.
+- **Eventos**: `download_intent`, `download_view`, `download_click`, `platform_select`, `donate_click`, `donate_qr_download`, `share_click`, `affiliate_click`, `consent_ads`, `consent_essential`.
 
 ## Legal y confianza
 

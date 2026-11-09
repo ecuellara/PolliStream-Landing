@@ -17,23 +17,44 @@ export const site = {
   },
 } as const
 
-export type SupportLink = {
-  label: string
-  url: string
-  note?: string
-}
-
 /**
- * Donation / premium links. Leave the array empty to show the share fallback
- * instead of a dead donation button.
+ * Support options rendered as cards in the #support section.
  *
- * Example:
- *   { label: 'Ko-fi', url: 'https://ko-fi.com/tu-usuario' }
- *   { label: 'PayPal', url: 'https://paypal.me/tu-usuario' }
+ * Yape: save the QR image as `public/donate/yape-qr.png`. The card stays
+ * disabled until that file exists, so the site never shows a broken QR.
+ * Set `holder` if you want to show the beneficiary name next to the code.
+ *
+ * PayPal: the donate link works with the account email and does not need a
+ * paypal.me profile. If you create one, set `handle` (without the @).
  */
 export const support = {
   enabled: true,
-  links: [] as SupportLink[],
+  yape: {
+    enabled: true,
+    /** Public path, served as-is so it can also be downloaded. */
+    qrPath: '/donate/yape-qr.png',
+    /** Name used by the "download QR" link. */
+    qrFileName: 'pollistream-yape.png',
+    /** Empty string hides the beneficiary name. */
+    holder: '',
+  },
+  paypal: {
+    enabled: true,
+    email: 'everson.20.23@gmail.com',
+    /** Optional paypal.me username, without the @. */
+    handle: '',
+    currency: 'USD',
+  },
+} as const
+
+export function paypalDonateUrl(): string {
+  if (support.paypal.handle) return `https://paypal.me/${support.paypal.handle}`
+  const params = new URLSearchParams({
+    business: support.paypal.email,
+    currency_code: support.paypal.currency,
+    item_name: 'PolliStream',
+  })
+  return `https://www.paypal.com/donate/?${params.toString()}`
 }
 
 export type AffiliateLink = {

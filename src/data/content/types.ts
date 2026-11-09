@@ -82,6 +82,7 @@ export type Common = {
   external: string
   share: string
   copied: string
+  downloads: string
   notFoundTitle: string
   notFoundBody: string
   goHome: string
@@ -204,6 +205,20 @@ export type Content = {
     share: string
     copied: string
     fallback: string
+    shareTitle: string
+    shareBody: string
+    yapeTitle: string
+    yapeBody: string
+    yapeCta: string
+    paypalTitle: string
+    paypalBody: string
+    paypalCta: string
+    yapeModalTitle: string
+    yapeModalBody: string
+    yapeSteps: string[]
+    yapeDownload: string
+    yapeClose: string
+    yapePending: string
   }
   affiliate: {
     kicker: string

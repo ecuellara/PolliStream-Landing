@@ -49,9 +49,23 @@ const classFor = (slug: string): string => {
           <span>{t.common.format} <strong>{product.fileType}</strong></span>
         </div>
 
+        {product.status === 'live' && (
+          <p class="platform-card__downloads" data-download-count={product.slug} hidden>
+            <Icon name="download" size={12} />
+            <strong data-download-count-value>0</strong>
+            <span>{t.common.downloads}</span>
+          </p>
+        )}
+
         <div class="platform-card__footer">
           {product.status === 'live' ? (
-            <a class="platform-card__cta" href={downloadPath(locale, product.slug)}>
+            <a
+              class="platform-card__cta"
+              href={downloadPath(locale, product.slug)}
+              data-track="download_intent"
+              data-track-platform={product.slug}
+              data-track-label={product.slug}
+            >
               {t.platforms.cta}
               <Icon name="arrow-right" size={14} />
             </a>
