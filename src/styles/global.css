@@ -807,6 +807,35 @@ hr {
   opacity: 0.35;
 }
 
+.device-mockup {
+  display: contents;
+}
+
+.device-screen__image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #040605;
+  pointer-events: none;
+  user-select: none;
+}
+
+.device[data-screen='true'] .device-mockup {
+  display: none;
+}
+
+.device[data-screen='false'] .device-screen__image {
+  display: none;
+}
+
+.device[data-screen='true'] .device-screen::after {
+  opacity: 0.12;
+}
+
 .device-topbar {
   display: flex;
   align-items: center;

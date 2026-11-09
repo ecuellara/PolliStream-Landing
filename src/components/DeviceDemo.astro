@@ -1,8 +1,10 @@
 ---
+import { getImage } from 'astro:assets'
 import Icon from './Icon.astro'
 import type { Locale } from '../data/content/types'
 import type { ProductSlug } from '../data/products'
 import { products, getProduct } from '../data/products'
+import { heroScreens } from '../data/screens'
 import { getContent, downloadPath } from '../lib/i18n'
 
 interface Props {
@@ -23,63 +25,94 @@ const displayLabel = (product: (typeof products)[number]): string => {
     : `${product.name} · ${device}`
 }
 const initialLabel = displayLabel(current)
+
+const screenUrls = Object.fromEntries(
+  await Promise.all(
+    Object.entries(heroScreens).map(async ([slug, source]) => {
+      if (!source) return [slug, undefined]
+
+      const optimized = await getImage({ src: source, width: 1200, format: 'webp', quality: 82 })
+      return [slug, optimized.src]
+    }),
+  ),
+) as Partial<Record<ProductSlug, string>>
+const currentScreenUrl = screenUrls[current.slug]
+const fallbackScreenUrl = Object.values(screenUrls).find((url): url is string => Boolean(url))
+const screenImageUrl = currentScreenUrl ?? (showPicker ? fallbackScreenUrl : undefined)
 ---
 
 <div class={`device-stage ${className}`} data-device-stage>
   <span class="device-stage__label" data-device-label>{initialLabel}</span>
   <span class="device-stage__code">{t.hero.demoLabel}</span>
 
-  <div class="device" data-device={current.slug} aria-hidden="true">
+  <div
+    class="device"
+    data-device={current.slug}
+    data-screen={currentScreenUrl ? 'true' : 'false'}
+    aria-hidden="true"
+  >
     <div class="device-shell">
       <div class="device-screen">
-        <div class="device-topbar">
-          <div class="device-topbar__brand">
-            <span class="device-topbar__dot"></span>
-            PolliStream
-          </div>
-          <div class="device-topbar__right">
-            <span>{t.device.live}</span>
-            <span>20:00</span>
-          </div>
-        </div>
-
-        <div class="device-body">
-          <div class="device-sidebar" aria-hidden="true">
-            <span class="device-sidebar__item" data-active="true"><Icon name="grid" size={12} /></span>
-            <span class="device-sidebar__item"><Icon name="tv" size={12} /></span>
-            <span class="device-sidebar__item"><Icon name="play" size={12} filled /></span>
-            <span class="device-sidebar__item"><Icon name="heart" size={12} /></span>
-            <span class="device-sidebar__item"><Icon name="clock" size={12} /></span>
-          </div>
-
-          <div class="device-main">
-            <div class="device-main__meta">
-              <span>{t.device.now} · 20:00</span>
-              <span>{t.device.signal}</span>
+        <div class="device-mockup">
+          <div class="device-topbar">
+            <div class="device-topbar__brand">
+              <span class="device-topbar__dot"></span>
+              PolliStream
             </div>
-            <div class="device-main__channel">
-              <div class="device-main__number">{t.device.channel}</div>
-              <div class="device-main__title">{t.device.titleLine1}<br />{t.device.titleLine2}</div>
-              <div class="device-main__program">{t.device.sample}</div>
-              <div class="device-progress"></div>
-              <div class="device-badges">
-                <span class="device-badge">{t.device.audio}</span>
-                <span class="device-badge">{t.device.subtitles}</span>
-                <span class="device-badge">{t.device.quality}</span>
+            <div class="device-topbar__right">
+              <span>{t.device.live}</span>
+              <span>20:00</span>
+            </div>
+          </div>
+
+          <div class="device-body">
+            <div class="device-sidebar" aria-hidden="true">
+              <span class="device-sidebar__item" data-active="true"><Icon name="grid" size={12} /></span>
+              <span class="device-sidebar__item"><Icon name="tv" size={12} /></span>
+              <span class="device-sidebar__item"><Icon name="play" size={12} filled /></span>
+              <span class="device-sidebar__item"><Icon name="heart" size={12} /></span>
+              <span class="device-sidebar__item"><Icon name="clock" size={12} /></span>
+            </div>
+
+            <div class="device-main">
+              <div class="device-main__meta">
+                <span>{t.device.now} · 20:00</span>
+                <span>{t.device.signal}</span>
+              </div>
+              <div class="device-main__channel">
+                <div class="device-main__number">{t.device.channel}</div>
+                <div class="device-main__title">{t.device.titleLine1}<br />{t.device.titleLine2}</div>
+                <div class="device-main__program">{t.device.sample}</div>
+                <div class="device-progress"></div>
+                <div class="device-badges">
+                  <span class="device-badge">{t.device.audio}</span>
+                  <span class="device-badge">{t.device.subtitles}</span>
+                  <span class="device-badge">{t.device.quality}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="device-guide" aria-hidden="true">
-            <span class="device-guide__title">{t.device.guide}</span>
-            {t.device.guideItems.map((item, index) => (
-              <span class="device-guide__item" data-active={index === 0 ? 'true' : undefined}>
-                <span class="device-guide__num">{String(index + 1).padStart(2, '0')}</span> {item}
-              </span>
-            ))}
-            <span class="device-guide__bar"></span>
+            <div class="device-guide" aria-hidden="true">
+              <span class="device-guide__title">{t.device.guide}</span>
+              {t.device.guideItems.map((item, index) => (
+                <span class="device-guide__item" data-active={index === 0 ? 'true' : undefined}>
+                  <span class="device-guide__num">{String(index + 1).padStart(2, '0')}</span> {item}
+                </span>
+              ))}
+              <span class="device-guide__bar"></span>
+            </div>
           </div>
         </div>
+        {screenImageUrl && (
+          <img
+            class="device-screen__image"
+            src={screenImageUrl}
+            alt=""
+            loading="eager"
+            decoding="async"
+            data-device-image
+          />
+        )}
       </div>
     </div>
     <div class="device-stand"></div>
@@ -96,6 +129,7 @@ const initialLabel = displayLabel(current)
           data-platform-pick={product.slug}
           data-platform-name={displayLabel(product)}
           data-platform-href={downloadPath(locale, product.slug)}
+          data-platform-screen={screenUrls[product.slug]}
         >
           <Icon name={product.icon} size={16} />
           <span>{t.hero.deviceLabels[product.slug]}</span>

@@ -102,23 +102,38 @@ function initPlatformPicker(): void {
   const device = stage.querySelector<HTMLElement>('[data-device]')
   const label = stage.querySelector<HTMLElement>('[data-device-label]')
   const link = stage.querySelector<HTMLAnchorElement>('[data-platform-link]')
+  const image = stage.querySelector<HTMLImageElement>('[data-device-image]')
   const buttons = Array.from(stage.querySelectorAll<HTMLButtonElement>('[data-platform-pick]'))
   if (!device || buttons.length === 0) return
+
+  const preloaded = new Set<string>()
+  const preloadScreen = (source?: string): void => {
+    if (!source || preloaded.has(source)) return
+    preloaded.add(source)
+    const preload = new Image()
+    preload.src = source
+  }
 
   const apply = (button: HTMLButtonElement): void => {
     const slug = button.dataset.platformPick ?? ''
     const name = button.dataset.platformName ?? ''
     const href = button.dataset.platformHref ?? ''
+    const screen = button.dataset.platformScreen ?? ''
 
     buttons.forEach((item) => item.setAttribute('aria-pressed', item === button ? 'true' : 'false'))
     device.dataset.device = slug
+    device.dataset.screen = screen ? 'true' : 'false'
+    if (image && screen) image.src = screen
     if (label) label.textContent = name
     if (link && href) link.href = href
     track('platform_select', { platform: slug })
   }
 
   buttons.forEach((button) => {
+    const screen = button.dataset.platformScreen
     button.addEventListener('click', () => apply(button))
+    button.addEventListener('pointerenter', () => preloadScreen(screen))
+    button.addEventListener('focus', () => preloadScreen(screen))
   })
 }
 
