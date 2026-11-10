@@ -5,7 +5,8 @@ export const site = {
   domain: 'pollistream.pages.dev',
   contactEmail: import.meta.env.PUBLIC_CONTACT_EMAIL ?? '',
   r2BaseUrl: (import.meta.env.PUBLIC_R2_BASE_URL ?? '').replace(/\/$/, ''),
-  cfBeaconToken: import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '',
+  cfBeaconToken:
+    import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '6c34df2971364fb4b1cf90df2b1e4021',
   plausibleDomain: import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN ?? '',
   locale: 'es',
   themeColor: '#050706',
