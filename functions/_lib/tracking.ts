@@ -3,6 +3,7 @@ export interface Env {
 }
 
 export const TRACKED_EVENTS = new Set([
+  'page_view',
   'download_intent',
   'download_view',
   'download_click',
@@ -37,7 +38,18 @@ export const TRACKED_PLATFORMS = new Set([
   'site',
 ])
 
-export const TRACKED_MODES = new Set(['direct', 'locker', 'share', 'none', ''])
+export const TRACKED_MODES = new Set([
+  'direct',
+  'locker',
+  'share',
+  'none',
+  'home',
+  'product',
+  'download',
+  'legal',
+  'page',
+  '',
+])
 
 export type Device = 'tv' | 'mobile' | 'tablet' | 'desktop'
 

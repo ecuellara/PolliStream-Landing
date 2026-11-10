@@ -211,7 +211,8 @@ Secrets/vars necesarios en GitHub:
 
 El sitio incluye contadores propios en Cloudflare D1, sin cookies ni identificadores personales.
 
-- **Endpoints**: `POST /api/track` registra eventos agregados por día, plataforma, dispositivo e idioma. `GET /api/stats` devuelve los totales y el número real de descargas de GitHub Releases.
+- **Endpoints**: `POST /api/track` registra eventos agregados por día, plataforma, dispositivo e idioma. `GET /api/stats` devuelve los totales, las descargas reales de GitHub y las visitas por página.
+- **Tráfico**: cada carga de página envía `page_view` con el tipo de página (`home`, `product`, `download`, `legal`, `page`) y la plataforma. Es agregado y sin cookies: cuenta visitas, no personas únicas.
 - **Dispositivo**: se deduce del `User-Agent` (`tv`, `mobile`, `tablet`, `desktop`); los bots se descartan.
 - **Contador visible**: cada tarjeta de plataforma y cada ficha de descarga muestra las descargas reales del asset de GitHub. Si la API de GitHub no responde en 3 s, se usa el número de clics registrado en D1.
 - **Base de datos**: `pollistream_stats`, binding `DB` en `wrangler.toml`. La tabla se crea con:
@@ -225,10 +226,13 @@ npx wrangler d1 execute pollistream_stats --remote --command "CREATE TABLE IF NO
 ```sh
 npx wrangler d1 execute pollistream_stats --remote --command "SELECT platform, event, SUM(count) total FROM events GROUP BY platform, event ORDER BY total DESC"
 npx wrangler d1 execute pollistream_stats --remote --command "SELECT device, SUM(count) total FROM events WHERE event='download_click' GROUP BY device"
+npx wrangler d1 execute pollistream_stats --remote --command "SELECT day, SUM(count) total FROM events WHERE event='page_view' GROUP BY day ORDER BY day DESC"
 ```
 
+- **Visitantes únicos y origen**: D1 cuenta páginas vistas, no personas. Para visitas únicas, país, referrers y Web Vitals usa **Cloudflare Web Analytics** (gratis y cookieless): activa Web Analytics en el proyecto de Pages y copia el token en `PUBLIC_CF_BEACON_TOKEN`.
+
 - **Proveedores externos** (opcional): `PUBLIC_CF_BEACON_TOKEN` para Cloudflare Web Analytics y `PUBLIC_PLAUSIBLE_DOMAIN` para Plausible.
-- **Eventos**: `download_intent`, `download_view`, `download_click`, `platform_select`, `donate_click`, `donate_qr_download`, `share_click`, `affiliate_click`, `consent_ads`, `consent_essential`.
+- **Eventos**: `page_view`, `download_intent`, `download_view`, `download_click`, `platform_select`, `donate_click`, `donate_qr_download`, `share_click`, `affiliate_click`, `consent_ads`, `consent_essential`.
 
 ## Legal y confianza
 

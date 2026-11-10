@@ -54,7 +54,9 @@ export async function onRequestGet(context: { env: Env }): Promise<Response> {
   const clicks: Totals = {}
   const intents: Totals = {}
   const views: Totals = {}
+  const pageviews: Totals = {}
   const devices: Totals = {}
+  const trafficDevices: Totals = {}
 
   if (env.DB) {
     try {
@@ -72,7 +74,9 @@ export async function onRequestGet(context: { env: Env }): Promise<Response> {
               ? intents
               : row.event === 'download_view'
                 ? views
-                : null
+                : row.event === 'page_view'
+                  ? pageviews
+                  : null
         if (bucket) bucket[row.platform] = (bucket[row.platform] ?? 0) + Number(row.total)
       }
 
@@ -86,6 +90,17 @@ export async function onRequestGet(context: { env: Env }): Promise<Response> {
       for (const row of byDevice.results ?? []) {
         devices[row.device] = Number(row.total)
       }
+
+      const trafficByDevice = await env.DB.prepare(
+        `SELECT device, SUM(count) AS total
+           FROM events
+          WHERE event = 'page_view'
+          GROUP BY device`,
+      ).all<{ device: string; total: number }>()
+
+      for (const row of trafficByDevice.results ?? []) {
+        trafficDevices[row.device] = Number(row.total)
+      }
     } catch {
       /* A missing table should not break the public counter. */
     }
@@ -97,7 +112,17 @@ export async function onRequestGet(context: { env: Env }): Promise<Response> {
   const downloads: Totals = github ?? { ...clicks }
 
   return json(
-    { ok: true, generatedAt: new Date().toISOString(), downloads, clicks, intents, views, devices },
+    {
+      ok: true,
+      generatedAt: new Date().toISOString(),
+      downloads,
+      clicks,
+      intents,
+      views,
+      pageviews,
+      devices,
+      trafficDevices,
+    },
     {
       headers: {
         // Short browser cache, slightly longer edge cache.

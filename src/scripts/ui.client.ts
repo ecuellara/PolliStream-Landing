@@ -71,6 +71,45 @@ function formatCount(value: number): string {
   }
 }
 
+const PLATFORM_SLUGS = new Set([
+  'lg',
+  'samsung',
+  'samsung-modern',
+  'android',
+  'android-tv',
+  'windows',
+  'roku',
+  'macos',
+  'ios',
+])
+
+/**
+ * Aggregate, cookieless page view. The D1 event carries only the page type,
+ * platform slug, device class inferred from the user agent and the language;
+ * it cannot identify a visitor.
+ */
+function initPageView(): void {
+  const parts = window.location.pathname.split('/').filter(Boolean)
+  if (parts.length > 0 && (parts[0] === 'es' || parts[0] === 'en' || parts[0] === 'pt')) {
+    parts.shift()
+  }
+
+  const slug = parts[0] ?? ''
+  let platform = 'site'
+  let mode = 'page'
+
+  if (slug === 'privacidad' || slug === 'terminos' || slug === 'cookies') {
+    mode = 'legal'
+  } else if (PLATFORM_SLUGS.has(slug)) {
+    platform = slug
+    mode = parts.includes('descargar') ? 'download' : 'product'
+  } else if (slug === '') {
+    mode = 'home'
+  }
+
+  track('page_view', { platform, mode })
+}
+
 async function initDownloadCounters(): Promise<void> {
   const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-download-count]'))
   if (nodes.length === 0) return
@@ -544,6 +583,7 @@ function initConsent(): void {
 }
 
 function init(): void {
+  initPageView()
   initMenu()
   initHeader()
   initReveal()
