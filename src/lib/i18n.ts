@@ -32,8 +32,8 @@ export const content: Record<Locale, Content> = { es, en, pt }
 export const platformLabels: Record<Locale, Record<ProductSlug, string>> = {
   es: {
     lg: 'Smart TV',
-    samsung: 'Smart TV · Tizen 3.0',
-    'samsung-modern': 'Smart TV · Tizen 6.5+',
+    samsung: 'Smart TV · Tizen 3.0 – 5.0',
+    'samsung-modern': 'Smart TV · Tizen 5.5+',
     android: 'Móvil y tablet',
     'android-tv': 'TV y Fire TV',
     windows: 'PC',
@@ -43,8 +43,8 @@ export const platformLabels: Record<Locale, Record<ProductSlug, string>> = {
   },
   en: {
     lg: 'Smart TV',
-    samsung: 'Smart TV · Tizen 3.0',
-    'samsung-modern': 'Smart TV · Tizen 6.5+',
+    samsung: 'Smart TV · Tizen 3.0 – 5.0',
+    'samsung-modern': 'Smart TV · Tizen 5.5+',
     android: 'Phone & tablet',
     'android-tv': 'TV & Fire TV',
     windows: 'PC',
@@ -54,8 +54,8 @@ export const platformLabels: Record<Locale, Record<ProductSlug, string>> = {
   },
   pt: {
     lg: 'Smart TV',
-    samsung: 'Smart TV · Tizen 3.0',
-    'samsung-modern': 'Smart TV · Tizen 6.5+',
+    samsung: 'Smart TV · Tizen 3.0 – 5.0',
+    'samsung-modern': 'Smart TV · Tizen 5.5+',
     android: 'Celular e tablet',
     'android-tv': 'TV e Fire TV',
     windows: 'PC',

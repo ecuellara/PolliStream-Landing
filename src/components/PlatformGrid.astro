@@ -10,11 +10,6 @@ interface Props {
 
 const { locale } = Astro.props
 const t = getContent(locale)
-const classFor = (slug: string): string => {
-  if (slug === 'lg') return 'platform-card platform-card--lg'
-  if (slug === 'samsung') return 'platform-card platform-card--half'
-  return 'platform-card platform-card--third'
-}
 ---
 
 <section class="section container-page" id="platforms">
@@ -28,7 +23,7 @@ const classFor = (slug: string): string => {
 
   <div class="platform-grid">
     {products.map((product, index) => (
-      <article class={classFor(product.slug)} data-accent={product.accent} data-reveal>
+      <article class="platform-card" data-accent={product.accent} data-reveal>
         <div class="platform-card__top">
           <span class="platform-card__icon">
             <Icon name={product.icon} size={24} />

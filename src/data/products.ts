@@ -138,7 +138,7 @@ const base: Record<
   samsung: {
     name: 'Samsung Tizen Legacy',
     shortName: 'Samsung Legacy',
-    platform: 'Smart TV',
+    platform: 'Smart TV · Tizen 3.0 – 5.0',
     family: 'tv',
     fileType: 'WGT / TPK',
     icon: 'samsung',
@@ -148,7 +148,7 @@ const base: Record<
   'samsung-modern': {
     name: 'Samsung Tizen moderno',
     shortName: 'Samsung Tizen',
-    platform: 'Smart TV · Tizen 6.5+',
+    platform: 'Smart TV · Tizen 5.5+',
     family: 'tv',
     fileType: 'WGT',
     icon: 'samsung',

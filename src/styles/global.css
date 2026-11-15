@@ -1245,19 +1245,7 @@ hr {
 
 @media (min-width: 1040px) {
   .platform-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-
-  .platform-card--lg {
-    grid-column: span 6;
-  }
-
-  .platform-card--half {
-    grid-column: span 6;
-  }
-
-  .platform-card--third {
-    grid-column: span 4;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
