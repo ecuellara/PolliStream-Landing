@@ -66,11 +66,13 @@ export const downloadConfig: Record<ProductSlug, DownloadConfig> = {
   samsung: {
     githubUrl:
       'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-samsung.wgt',
+    version: '1.0.3',
     fileName: 'pollistream-samsung.wgt',
   },
   'samsung-modern': {
     githubUrl:
       'https://github.com/ecuellara/PolliStream-Downloads/releases/download/downloads/pollistream-samsung-modern.wgt',
+    version: '1.0.3',
     fileName: 'pollistream-samsung-modern.wgt',
   },
   android: {
