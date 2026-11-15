@@ -1,0 +1,271 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import { getContent } from '../lib/i18n'
+import { installerApp } from '../data/installer'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+const copy = t.installer
+const ready = installerApp.available
+---
+
+<section class="section section--tight container-page" id="installer">
+  <div class="installer-panel" data-reveal>
+    <div class="installer-main">
+      <p class="eyebrow">
+        <span class="installer-badge">{copy.badge}</span>
+        {copy.kicker}
+      </p>
+
+      <h2 class="installer-title">{copy.title}</h2>
+      <p class="installer-body">{copy.body}</p>
+
+      <ul class="installer-platforms">
+        {copy.platforms.map((platform) => (
+          <li>
+            <Icon name="check" size={12} />
+            {platform}
+          </li>
+        ))}
+      </ul>
+
+      <div class="installer-action">
+        {ready ? (
+          <a
+            class="btn btn-primary"
+            href={installerApp.url}
+            data-track="download_intent"
+            data-track-platform="installer"
+            data-track-label="installer"
+          >
+            <Icon name="download" size={16} />
+            {copy.cta}
+            {installerApp.size && <span class="installer-size">{installerApp.size}</span>}
+          </a>
+        ) : (
+          <span class="installer-soon">{copy.soon}</span>
+        )}
+
+        <p class="installer-meta">
+          {copy.meta}
+          {ready && installerApp.version && <span> · v{installerApp.version}</span>}
+        </p>
+
+        {ready && (
+          <p class="installer-count" data-download-count="installer" hidden>
+            <Icon name="download" size={12} />
+            <strong data-download-count-value>0</strong>
+            <span>{t.common.downloads}</span>
+          </p>
+        )}
+      </div>
+    </div>
+
+    <ol class="installer-steps">
+      {copy.steps.map((step, index) => (
+        <li class="installer-step">
+          <span class="installer-step__index">{String(index + 1).padStart(2, '0')}</span>
+          <div>
+            <p class="installer-step__title">{step.title}</p>
+            <p class="installer-step__body">{step.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <p class="installer-note">{copy.note}</p>
+</section>
+
+<style>
+  .installer-panel {
+    position: relative;
+    display: grid;
+    gap: clamp(1.6rem, 4vw, 3rem);
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border: 1px solid rgba(198, 255, 61, 0.35);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(80% 120% at 0% 0%, rgba(198, 255, 61, 0.14), transparent 55%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.04), transparent 50%),
+      var(--color-panel);
+    overflow: hidden;
+  }
+
+  .installer-panel::after {
+    content: '';
+    position: absolute;
+    inset: auto -20% -60% auto;
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(198, 255, 61, 0.12), transparent 62%);
+    pointer-events: none;
+  }
+
+  .installer-main {
+    position: relative;
+    z-index: 1;
+  }
+
+  .installer-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--color-lime);
+    color: #0a1206;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+
+  .installer-title {
+    margin-top: 16px;
+    max-width: 22ch;
+    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .installer-body {
+    margin-top: 16px;
+    max-width: 54ch;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  .installer-platforms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .installer-platforms li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border: 1px solid var(--color-white-10);
+    border-radius: 999px;
+    color: var(--color-paper);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .installer-platforms svg {
+    color: var(--color-lime);
+  }
+
+  .installer-action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    margin-top: 26px;
+  }
+
+  .installer-size {
+    margin-left: 6px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+    font-size: 0.72rem;
+    opacity: 0.8;
+  }
+
+  .installer-soon {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .installer-meta {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .installer-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-lime);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .installer-count[hidden] {
+    display: none;
+  }
+
+  .installer-steps {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .installer-step {
+    display: flex;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-white-10);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .installer-step__index {
+    flex: none;
+    color: var(--color-lime);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .installer-step__title {
+    color: var(--color-paper);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .installer-step__body {
+    margin-top: 6px;
+    color: var(--color-muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .installer-note {
+    margin-top: 14px;
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  @media (min-width: 900px) {
+    .installer-panel {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      align-items: center;
+    }
+  }
+</style>

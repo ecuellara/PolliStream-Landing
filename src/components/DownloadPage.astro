@@ -2,6 +2,7 @@
 import Layout from './Layout.astro'
 import DownloadGate from './DownloadGate.astro'
 import InstallationGuide from './InstallationGuide.astro'
+import WhatsAppFab from './WhatsAppFab.astro'
 import Icon from './Icon.astro'
 import type { Locale } from '../data/content/types'
 import type { ProductMeta } from '../data/products'
@@ -52,6 +53,8 @@ const home = homePath(locale)
       </a>
     </div>
   </div>
+
+  <WhatsAppFab locale={locale} platform={product.name} />
 </Layout>
 
 <style>

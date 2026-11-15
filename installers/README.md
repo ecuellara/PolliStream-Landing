@@ -14,6 +14,7 @@ Coloca cada instalador en la carpeta de su plataforma. El script `scripts/sync-i
 | `roku/` | `.zip` |
 | `macos/` | `.dmg`, `.pkg` |
 | `ios/` | `.ipa` |
+| `installer/` | `.apk` — instalador todo en uno para LG, Samsung y Android TV |
 
 El número de versión se detecta en el nombre del archivo (por ejemplo, `PolliStream-Setup-1.0.0.exe`). Si no aparece, se usa `latest`.
 

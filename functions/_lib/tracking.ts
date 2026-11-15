@@ -12,6 +12,7 @@ export const TRACKED_EVENTS = new Set([
   'donate_qr_download',
   'share_click',
   'affiliate_click',
+  'whatsapp_click',
   'consent_ads',
   'consent_essential',
 ])
@@ -26,6 +27,7 @@ export const TRACKED_PLATFORMS = new Set([
   'roku',
   'macos',
   'ios',
+  'installer',
   'yape',
   'paypal',
   'whatsapp',

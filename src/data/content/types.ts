@@ -104,6 +104,7 @@ export type Content = {
     faq: string
     support: string
     download: string
+    installer: string
   }
   device: {
     live: string
@@ -140,6 +141,26 @@ export type Content = {
     live: string
     soon: string
     all: string
+  }
+  installer: {
+    kicker: string
+    badge: string
+    highlight: string
+    title: string
+    body: string
+    platforms: string[]
+    cta: string
+    meta: string
+    steps: { title: string; body: string }[]
+    note: string
+    soon: string
+  }
+  whatsapp: {
+    title: string
+    hint: string
+    aria: string
+    /** Prefilled message; `{platform}` is replaced with the product name. */
+    message: string
   }
   features: {
     kicker: string

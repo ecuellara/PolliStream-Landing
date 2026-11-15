@@ -1,0 +1,144 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import { getContent } from '../lib/i18n'
+import { whatsappNumber } from '../data/installer'
+
+interface Props {
+  locale: Locale
+  /** Device name shown in the prefilled message, e.g. "LG webOS". */
+  platform: string
+}
+
+const { locale, platform } = Astro.props
+const copy = getContent(locale).whatsapp
+const message = copy.message.replace('{platform}', platform)
+const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+---
+
+<a
+  class="wa-fab"
+  href={href}
+  target="_blank"
+  rel="noopener"
+  aria-label={`${copy.aria} (${copy.hint})`}
+  data-track="whatsapp_click"
+  data-track-platform="whatsapp"
+  data-track-label={platform}
+>
+  <span class="wa-fab__icon" aria-hidden="true">
+    <Icon name="whatsapp" size={22} />
+  </span>
+  <span class="wa-fab__copy">
+    <strong>{copy.title}</strong>
+    <span>{copy.hint}</span>
+  </span>
+  <Icon name="arrow-up-right" size={14} class="wa-fab__arrow" />
+</a>
+
+<style>
+  .wa-fab {
+    position: fixed;
+    right: calc(16px + env(safe-area-inset-right));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(320px, calc(100vw - 32px));
+    padding: 10px 14px 10px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: #25d366;
+    color: #04331c;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    text-decoration: none;
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      background 160ms ease;
+  }
+
+  .wa-fab:hover {
+    background: #2ee06f;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+  }
+
+  .wa-fab:focus-visible {
+    outline: 2px solid var(--color-paper);
+    outline-offset: 3px;
+  }
+
+  .wa-fab__icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .wa-fab__copy {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .wa-fab__copy strong {
+    font-family: var(--font-sans);
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .wa-fab__copy span {
+    font-size: 0.68rem;
+    font-weight: 500;
+    line-height: 1.25;
+    opacity: 0.85;
+  }
+
+  .wa-fab__arrow {
+    flex: none;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 480px) {
+    .wa-fab {
+      right: calc(12px + env(safe-area-inset-right));
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      gap: 8px;
+      padding: 8px 12px 8px 8px;
+    }
+
+    .wa-fab__icon {
+      width: 34px;
+      height: 34px;
+    }
+
+    .wa-fab__copy strong {
+      font-size: 0.78rem;
+    }
+
+    .wa-fab__copy span {
+      font-size: 0.62rem;
+    }
+
+    .wa-fab__arrow {
+      display: none;
+    }
+  }
+
+  /* Never sit on top of an open modal. */
+  body:has(dialog[open]) .wa-fab {
+    visibility: hidden;
+  }
+
+  /* The cookie banner shares the bottom-right corner on first visit. */
+  body:has(.consent:not([hidden])) .wa-fab {
+    visibility: hidden;
+  }
+</style>

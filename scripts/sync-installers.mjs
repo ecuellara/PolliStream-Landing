@@ -83,6 +83,8 @@ const platforms = [
   { slug: 'roku', extensions: ['.zip'] },
   { slug: 'macos', extensions: ['.dmg', '.pkg'] },
   { slug: 'ios', extensions: ['.ipa'] },
+  // Helper app that installs PolliStream on LG, Samsung and Android TV.
+  { slug: 'installer', extensions: ['.apk'] },
 ]
 
 for (const { slug, extensions } of platforms) {

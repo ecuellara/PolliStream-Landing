@@ -56,6 +56,7 @@ export const pt: Content = {
     faq: 'Perguntas',
     support: 'Apoiar',
     download: 'Baixar',
+    installer: 'Instalador',
   },
   device: {
     live: 'AO VIVO',
@@ -108,6 +109,29 @@ export const pt: Content = {
     live: 'Disponível',
     soon: 'Em breve',
     all: 'Ver todas as plataformas',
+  },
+  installer: {
+    kicker: 'INSTALADOR TUDO EM UM',
+    badge: 'Novo',
+    highlight: 'Sem comandos: instale pelo celular com o instalador tudo em um',
+    title: 'Instale o PolliStream na TV pelo celular',
+    body: 'Um único APK encontra a sua TV e envia o PolliStream para LG webOS, Samsung Tizen (3.0 – 5.0 e 5.5+) e Android TV. Sem Tizen Studio, sem cabos e sem comandos.',
+    platforms: ['LG webOS', 'Samsung Tizen 3.0 – 5.0', 'Samsung Tizen 5.5+', 'Android TV'],
+    cta: 'Baixar instalador (APK)',
+    meta: 'APK · Android 10 ou superior',
+    steps: [
+      { title: 'Baixe o APK', body: 'Instale no seu celular Android e permita fontes desconhecidas se o sistema pedir.' },
+      { title: 'Conecte celular e TV', body: 'Deixe os dois na mesma rede Wi-Fi e abra o app.' },
+      { title: 'Escolha sua tela', body: 'Selecione LG, Samsung ou Android TV e siga as instruções na tela.' },
+    ],
+    note: 'Versão beta. Se a sua TV não aparecer, instale o pacote da sua plataforma na seção de downloads.',
+    soon: 'Instalador em preparação.',
+  },
+  whatsapp: {
+    title: 'Ainda não tem conta?',
+    hint: 'Ajudamos você pelo WhatsApp',
+    aria: 'Falar no WhatsApp para pedir uma conta',
+    message: 'Olá, vim do PolliStream. Quero uma conta para assistir no {platform}.',
   },
   features: {
     kicker: 'O QUE ELE FAZ',
