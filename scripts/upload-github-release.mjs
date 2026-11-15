@@ -30,10 +30,8 @@ const assets = platforms.flatMap((slug) => {
   if (!entry.sourcePath) throw new Error(`Missing source path for ${slug} installer.`)
   const file = join(installersDir, entry.sourcePath)
   if (!existsSync(file)) throw new Error(`Missing synchronized installer: ${file}`)
-  const staged = join(stagingDir, entry.fileName)
-  copyFileSync(file, staged)
   expectedNames.add(entry.fileName)
-  return [staged]
+  return [{ name: entry.fileName, file, sha256: entry.sha256 }]
 })
 
 if (assets.length === 0) {
@@ -52,7 +50,9 @@ const listAssets = () =>
 
 try {
   if (dryRun) {
-    console.log(`[dry-run] Upload ${assets.map((file) => file.slice(stagingDir.length + 1)).join(', ')} to ${repo} release ${tag}`)
+    console.log(
+      `[dry-run] Upload ${assets.map((asset) => asset.name).join(', ')} to ${repo} release ${tag}`,
+    )
     if (prune) console.log(`[dry-run] Prune assets not named: ${[...expectedNames].join(', ')}`)
   } else {
     let releaseExists = false
@@ -63,28 +63,48 @@ try {
       releaseExists = false
     }
 
-    if (releaseExists) {
-      execFileSync(gh, ['release', 'upload', tag, '--repo', repo, '--clobber', ...assets], {
-        cwd: root,
-        stdio: 'inherit',
-      })
+    // Re-uploading an identical asset resets its download count, so only send
+    // the files whose checksum changed since the last release.
+    const remote = releaseExists ? listAssets() : []
+    const remoteDigests = new Map(
+      remote.map((asset) => [asset.name, (asset.digest ?? '').replace(/^sha256:/, '')]),
+    )
+    const pending = assets.filter((asset) => remoteDigests.get(asset.name) !== asset.sha256)
+
+    if (pending.length === 0) {
+      console.log('[github] All installer assets are already up to date.')
     } else {
-      execFileSync(
-        gh,
-        [
-          'release',
-          'create',
-          tag,
-          '--repo',
-          repo,
-          '--title',
-          'PolliStream installers',
-          '--notes',
-          'Public installer downloads for PolliStream.',
-          ...assets,
-        ],
-        { cwd: root, stdio: 'inherit' },
-      )
+      const staged = pending.map((asset) => {
+        const target = join(stagingDir, asset.name)
+        copyFileSync(asset.file, target)
+        return target
+      })
+
+      if (releaseExists) {
+        execFileSync(gh, ['release', 'upload', tag, '--repo', repo, '--clobber', ...staged], {
+          cwd: root,
+          stdio: 'inherit',
+        })
+      } else {
+        execFileSync(
+          gh,
+          [
+            'release',
+            'create',
+            tag,
+            '--repo',
+            repo,
+            '--title',
+            'PolliStream installers',
+            '--notes',
+            'Public installer downloads for PolliStream.',
+            ...staged,
+          ],
+          { cwd: root, stdio: 'inherit' },
+        )
+      }
+
+      console.log(`[github] Uploaded: ${pending.map((asset) => asset.name).join(', ')}`)
     }
 
     if (prune) {
