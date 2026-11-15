@@ -4,6 +4,7 @@ import Hero from './Hero.astro'
 import SignalBand from './SignalBand.astro'
 import PlatformGrid from './PlatformGrid.astro'
 import InstallerApp from './InstallerApp.astro'
+import WhatsAppFab from './WhatsAppFab.astro'
 import FeatureRack from './FeatureRack.astro'
 import SignalFlow from './SignalFlow.astro'
 import InstallSteps from './InstallSteps.astro'
@@ -105,6 +106,8 @@ const jsonLd = [
       </div>
     </div>
   </section>
+
+  <WhatsAppFab locale={locale} platform={locale === 'en' ? 'your TV' : locale === 'pt' ? 'sua TV' : 'tu TV'} />
 </Layout>
 
 <style>

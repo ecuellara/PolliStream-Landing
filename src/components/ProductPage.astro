@@ -3,6 +3,7 @@ import Layout from './Layout.astro'
 import Icon from './Icon.astro'
 import DeviceDemo from './DeviceDemo.astro'
 import AdSlot from './AdSlot.astro'
+import WhatsAppFab from './WhatsAppFab.astro'
 import type { Locale } from '../data/content/types'
 import type { ProductMeta, ProductSlug } from '../data/products'
 import {
@@ -267,6 +268,8 @@ const jsonLd = [
       </div>
     </section>
   </div>
+
+  <WhatsAppFab locale={locale} platform={product.name} />
 </Layout>
 
 <style>

@@ -21,7 +21,8 @@ const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)
   href={href}
   target="_blank"
   rel="noopener"
-  aria-label={`${copy.aria} (${copy.hint})`}
+  aria-label={`${copy.title} ${copy.hint}`}
+  title={copy.aria}
   data-track="whatsapp_click"
   data-track-platform="whatsapp"
   data-track-label={platform}
@@ -30,7 +31,7 @@ const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)
     <Icon name="whatsapp" size={22} />
   </span>
   <span class="wa-fab__copy">
-    <strong>{copy.title}</strong>
+    <strong>{copy.title}</strong>{' '}
     <span>{copy.hint}</span>
   </span>
   <Icon name="arrow-up-right" size={14} class="wa-fab__arrow" />

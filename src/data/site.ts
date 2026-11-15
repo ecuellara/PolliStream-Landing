@@ -3,7 +3,10 @@ export const site = {
   shortName: 'PolliStream',
   url: (import.meta.env.SITE_URL ?? 'https://pollistream.pages.dev').replace(/\/$/, ''),
   domain: 'pollistream.pages.dev',
-  contactEmail: import.meta.env.PUBLIC_CONTACT_EMAIL ?? '',
+  // Public support address. Override with PUBLIC_CONTACT_EMAIL once a custom
+  // domain mailbox exists; ads and store reviews expect a reachable contact.
+  contactEmail:
+    import.meta.env.PUBLIC_CONTACT_EMAIL || 'everson.20.23@gmail.com',
   r2BaseUrl: (import.meta.env.PUBLIC_R2_BASE_URL ?? '').replace(/\/$/, ''),
   cfBeaconToken:
     import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '6c34df2971364fb4b1cf90df2b1e4021',
@@ -12,9 +15,10 @@ export const site = {
   themeColor: '#050706',
   icon: '/brand/icon-256.png',
   ogImages: {
-    es: '/brand/og-es.png',
-    en: '/brand/og-en.png',
-    pt: '/brand/og-pt.png',
+    // `?v=` busts the cached preview in WhatsApp, Facebook and X after a redesign.
+    es: '/brand/og-es.png?v=2',
+    en: '/brand/og-en.png?v=2',
+    pt: '/brand/og-pt.png?v=2',
   },
 } as const
 
@@ -67,7 +71,7 @@ export type AffiliateLink = {
 }
 
 /**
- * IPTV provider affiliate links. Keep this empty until you have a real,
+ * Streaming provider affiliate links. Keep this empty until you have a real,
  * disclosed partner deal; the section is hidden when empty.
  */
 export const affiliate = {

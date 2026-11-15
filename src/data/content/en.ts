@@ -2,9 +2,9 @@ import type { Content } from './types'
 
 export const en: Content = {
   meta: {
-    title: 'PolliStream — Your IPTV on LG, Samsung, Android TV and Windows',
+    title: 'PolliStream — Your player on LG, Samsung, Android TV and Windows',
     description:
-      'IPTV player for Smart TV, Android and Windows. Connect your Xtream list, browse live TV, movies and series, and enjoy audio and subtitles. Download free.',
+      'Media player for Smart TV, Android and Windows. Connect your Xtream list, browse live TV, movies and series, and enjoy audio and subtitles. Download free.',
     ogAlt: 'PolliStream, your Xtream list on every screen',
   },
   common: {
@@ -73,8 +73,8 @@ export const en: Content = {
     quality: '1080p',
   },
   hero: {
-    eyebrow: 'IPTV PLAYER · XTREAM · MULTI-PLATFORM',
-    titleA: 'All your IPTV.',
+    eyebrow: 'MEDIA PLAYER · XTREAM · MULTI-PLATFORM',
+    titleA: 'All your content.',
     titleB: 'On the screen you choose.',
     description:
       'PolliStream connects your Xtream list and organizes live TV, movies and series in an interface built for the couch. No PolliStream account. No middlemen.',
@@ -1085,7 +1085,7 @@ export const en: Content = {
         {
           title: 'Purpose',
           body: [
-            'PolliStream is an IPTV player. It does not sell, host, distribute or recommend audiovisual content. The site only distributes the software and explains how to install it.',
+            'PolliStream is a media player. It does not sell, host, distribute or recommend audiovisual content. The site only distributes the software and explains how to install it.',
           ],
         },
         {
