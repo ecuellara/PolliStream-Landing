@@ -54,7 +54,7 @@ const home = homePath(locale)
     </div>
   </div>
 
-  <WhatsAppFab locale={locale} platform={product.name} />
+  {product.status === 'live' && <WhatsAppFab locale={locale} platform={product.name} />}
 </Layout>
 
 <style>
