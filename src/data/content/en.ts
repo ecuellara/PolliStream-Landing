@@ -429,11 +429,11 @@ export const en: Content = {
         note: 'The IPK includes the app and the local track service. Install the full package so the audio menu works.',
       },
       samsung: {
-        kicker: 'SAMSUNG TIZEN 3.0 · LEGACY',
+        kicker: 'SAMSUNG TIZEN 3.0 – 5.0 · LEGACY',
         title: 'PolliStream for Samsung Legacy',
-        tagline: 'The version for Samsung TVs running Tizen 3.0.',
+        tagline: 'The version for Samsung TVs running Tizen 3.0 to 5.0.',
         description:
-          'This is the Legacy build for Tizen 3.0. Do not install it on modern Samsung TVs; those will have a separate package.',
+          'This is the Legacy build for Tizen 3.0 to 5.0. Do not install it on Samsung TVs running Tizen 5.5 or later; they have a separate package.',
         features: [
           { index: '01', tag: 'REMOTE', title: 'Remote navigation', body: 'Catalog rows and clear focus so you can move without a mouse.' },
           { index: '02', tag: 'CATALOG', title: 'Everything in order', body: 'Live TV, movies and series with the same order as on your other screens.' },
@@ -441,7 +441,7 @@ export const en: Content = {
           { index: '04', tag: 'CONTROL', title: 'Parental control', body: 'Four-digit PIN for adult content.' },
         ],
         requirements: [
-          'Samsung TV compatible with Tizen 3.0',
+          'Samsung TV with Tizen 3.0 to 5.0',
           'Stable internet connection',
           'Active Xtream account',
           'Developer Mode and Tizen installation tool',
@@ -450,10 +450,10 @@ export const en: Content = {
           {
             index: '01',
             title: 'Confirm the model and version',
-            body: 'This package is only for Samsung TVs running Tizen 3.0.',
+            body: 'This package is only for Samsung TVs running Tizen 3.0 to 5.0.',
             details: [
               'Open Settings › Support › About this TV and check the model and system version.',
-              'If the TV runs Tizen 6.5 or later, use the modern Samsung page instead of this package.',
+              'If the TV runs Tizen 5.5 or later, use the modern Samsung page instead of this package.',
               'Make sure the TV and the computer are on the same network.',
               'Have your Xtream server, username and password ready.',
             ],
@@ -483,10 +483,10 @@ export const en: Content = {
           {
             index: '04',
             title: 'Install the Legacy WGT',
-            body: 'Send the package compatible with Tizen 3.0 from the command line.',
+            body: 'Send the package compatible with Tizen 3.0 to 5.0 from the command line.',
             details: [
               'Download pollistream-samsung.wgt from this page and do not rename it.',
-              'Use this WGT only on Tizen 3.0 Legacy TVs; do not install it on modern models.',
+              'Use this WGT only on Tizen 3.0 to 5.0 TVs; do not install it on models running Tizen 5.5 or later.',
               'If installation fails because of the certificate, sign the package again in Tizen Studio and resend it.',
               'When it finishes, the PolliStream icon appears in the TV app row.',
             ],
@@ -507,36 +507,36 @@ export const en: Content = {
             ],
           },
         ],
-        note: 'Do not use this package on modern Samsung TVs. Their build will be published separately.',
+        note: 'Do not use this package on Samsung TVs running Tizen 5.5 or later: download the modern build.',
       },
       'samsung-modern': {
-        kicker: 'MODERN SAMSUNG TIZEN · 6.5+',
+        kicker: 'MODERN SAMSUNG TIZEN · 5.5+',
         title: 'PolliStream for modern Samsung TVs',
-        tagline: 'A separate package for modern Tizen TVs.',
+        tagline: 'A separate package for Samsung TVs running Tizen 5.5 or later.',
         description:
-          'The modern version is not published yet. Its installer and platform-specific instructions will appear here once tested.',
+          'The installer for Tizen 5.5 or later is published. If your TV runs Tizen 3.0 to 5.0, download the Legacy package.',
         features: [
-          { index: '01', tag: 'IN PROGRESS', title: 'Modern build', body: 'The WGT for modern Tizen will be published after compatibility testing.' },
-          { index: '02', tag: 'GUIDE', title: 'Specific instructions', body: 'The guide will distinguish this version from the Tizen 3.0 Legacy package.' },
+          { index: '01', tag: 'BUILD', title: 'Modern package', body: 'A WGT separate from the Legacy package, for Tizen 5.5 or later.' },
+          { index: '02', tag: 'GUIDE', title: 'Specific instructions', body: 'The guide distinguishes this version from the Tizen 3.0 to 5.0 Legacy package.' },
         ],
-        requirements: ['Samsung TV compatible with Tizen 6.5 or later', 'Modern build not available yet'],
+        requirements: ['Samsung TV with Tizen 5.5 or later', 'Stable internet connection', 'Active Xtream account'],
         install: [
           {
             index: '01',
             title: 'Check your Tizen version',
-            body: 'This package will be exclusive to Samsung TVs running Tizen 6.5 or later.',
+            body: 'This package is for Samsung TVs running Tizen 5.5 or later.',
             details: [
               'Open Settings › Support › About this TV and note the system version.',
-              'If the TV runs Tizen 3.0, download the Legacy package from its own page.',
+              'If the TV runs Tizen 3.0 to 5.0, download the Legacy package from its own page.',
               'Do not install the Legacy WGT on a modern TV: the app may not start.',
             ],
           },
           {
             index: '02',
-            title: 'Wait for the tested modern WGT',
-            body: 'The modern installer is not published yet.',
+            title: 'Download the modern WGT',
+            body: 'Download pollistream-samsung-modern.wgt from this page.',
             details: [
-              'The package will appear on this page when compatibility testing is complete.',
+              'Use the file from this page; do not install third-party WGT files.',
               'Do not use third-party WGT files or older builds to force the installation.',
               'When it is published, verify the file name and size before installing.',
             ],
@@ -558,7 +558,7 @@ export const en: Content = {
           {
             index: '04',
             title: 'Connect your account',
-            body: 'When the package is available, configure Xtream and choose your profile.',
+            body: 'Configure Xtream and choose your profile.',
             details: [
               'Enter your Xtream server, username and password.',
               'Test the connection and review live TV, movies and series.',
@@ -566,7 +566,7 @@ export const en: Content = {
             ],
           },
         ],
-        note: 'Do not install the Tizen 3.0 Legacy WGT here.',
+        note: 'Do not install the Tizen 3.0 to 5.0 Legacy WGT here.',
       },
       android: {
         kicker: 'ANDROID · PHONE AND TABLET',
