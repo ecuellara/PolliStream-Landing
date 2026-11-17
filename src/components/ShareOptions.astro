@@ -1,0 +1,83 @@
+---
+import Icon from './Icon.astro'
+import type { Locale } from '../data/content/types'
+import { getContent, homePath } from '../lib/i18n'
+import { site } from '../data/site'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = getContent(locale)
+const shareUrl = `${site.url}${homePath(locale)}`
+const shareText = encodeURIComponent('PolliStream')
+const shareUrlEncoded = encodeURIComponent(shareUrl)
+const shareLinks = {
+  whatsapp: `https://wa.me/?text=${encodeURIComponent(`PolliStream ${shareUrl}`)}`,
+  telegram: `https://t.me/share/url?url=${shareUrlEncoded}&text=${shareText}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${shareUrlEncoded}`,
+  x: `https://x.com/intent/tweet?url=${shareUrlEncoded}&text=${shareText}`,
+  email: `mailto:?subject=${shareText}&body=${encodeURIComponent(shareUrl)}`,
+}
+---
+
+<div class="share-grid">
+  <a
+    class="share-option"
+    href={shareLinks.whatsapp}
+    target="_blank"
+    rel="noopener"
+    data-share-network="whatsapp"
+  >
+    <span class="share-option__icon"><Icon name="whatsapp" size={18} /></span>
+    {t.support.shareWhatsApp}
+  </a>
+  <a
+    class="share-option"
+    href={shareLinks.telegram}
+    target="_blank"
+    rel="noopener"
+    data-share-network="telegram"
+  >
+    <span class="share-option__icon"><Icon name="telegram" size={18} /></span>
+    {t.support.shareTelegram}
+  </a>
+  <a
+    class="share-option"
+    href={shareLinks.facebook}
+    target="_blank"
+    rel="noopener"
+    data-share-network="facebook"
+  >
+    <span class="share-option__icon"><Icon name="facebook" size={18} /></span>
+    {t.support.shareFacebook}
+  </a>
+  <a
+    class="share-option"
+    href={shareLinks.x}
+    target="_blank"
+    rel="noopener"
+    data-share-network="x"
+  >
+    <span class="share-option__icon"><Icon name="x" size={18} /></span>
+    {t.support.shareX}
+  </a>
+  <a class="share-option" href={shareLinks.email} data-share-network="email">
+    <span class="share-option__icon"><Icon name="mail" size={18} /></span>
+    {t.support.shareEmail}
+  </a>
+  <button
+    class="share-option"
+    type="button"
+    data-share-copy
+    data-copied-label={t.support.copied}
+  >
+    <span class="share-option__icon"><Icon name="copy" size={18} /></span>
+    <span data-share-copy-label>{t.support.shareCopy}</span>
+  </button>
+  <button class="share-option" type="button" data-share-native hidden>
+    <span class="share-option__icon"><Icon name="share" size={18} /></span>
+    {t.support.shareNative}
+  </button>
+</div>

@@ -209,7 +209,6 @@ export type Content = {
     openInstaller: string
     afterDownloadTitle: string
     afterDownloadBody: string
-    afterDownloadShare: string
     tutorialKicker: string
     tutorialTitle: string
     tutorialBody: string

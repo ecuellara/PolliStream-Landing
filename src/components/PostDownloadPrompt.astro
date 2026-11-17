@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro'
+import ShareOptions from './ShareOptions.astro'
 import type { Locale } from '../data/content/types'
 import { getContent, homePath } from '../lib/i18n'
 import { site } from '../data/site'
@@ -11,10 +12,16 @@ interface Props {
 const { locale } = Astro.props
 const t = getContent(locale)
 const shareUrl = `${site.url}${homePath(locale)}`
-const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`PolliStream ${shareUrl}`)}`
 ---
 
-<dialog class="post-download" data-post-download-dialog aria-labelledby="post-download-title">
+<dialog
+  class="post-download"
+  data-post-download-dialog
+  data-share-modal="post-download"
+  data-share-url={shareUrl}
+  data-share-title="PolliStream"
+  aria-labelledby="post-download-title"
+>
   <div class="post-download__panel">
     <button
       class="post-download__close"
@@ -29,17 +36,9 @@ const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`PolliStream ${sha
     <h2 class="post-download__title" id="post-download-title">{t.download.afterDownloadTitle}</h2>
     <p class="post-download__body">{t.download.afterDownloadBody}</p>
 
+    <ShareOptions locale={locale} />
+
     <div class="post-download__actions">
-      <a
-        class="btn btn-primary"
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener"
-        data-post-download-share
-      >
-        <Icon name="share" size={15} />
-        {t.download.afterDownloadShare}
-      </a>
       <a class="btn btn-secondary" href={`${homePath(locale)}#support`} data-post-download-donate>
         {t.support.donate}
         <Icon name="arrow-up-right" size={14} />

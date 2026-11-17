@@ -2,6 +2,7 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import Icon from './Icon.astro'
+import ShareOptions from './ShareOptions.astro'
 import type { Locale } from '../data/content/types'
 import { getContent, homePath } from '../lib/i18n'
 import { affiliate, paypalDonateUrl, site, support } from '../data/site'
@@ -19,15 +20,6 @@ const hasAffiliate = affiliate.enabled && affiliate.links.length > 0
 const qrMissing = !existsSync(join(process.cwd(), 'public', support.yape.qrPath))
 const yapeReady = support.yape.enabled && !qrMissing
 const paypalUrl = paypalDonateUrl()
-const shareText = encodeURIComponent('PolliStream')
-const shareUrlEncoded = encodeURIComponent(shareUrl)
-const shareLinks = {
-  whatsapp: `https://wa.me/?text=${encodeURIComponent(`PolliStream ${shareUrl}`)}`,
-  telegram: `https://t.me/share/url?url=${shareUrlEncoded}&text=${shareText}`,
-  facebook: `https://www.facebook.com/sharer/sharer.php?u=${shareUrlEncoded}`,
-  x: `https://x.com/intent/tweet?url=${shareUrlEncoded}&text=${shareText}`,
-  email: `mailto:?subject=${shareText}&body=${encodeURIComponent(shareUrl)}`,
-}
 ---
 
 <section class="section section--tight container-page" id="support">
@@ -97,7 +89,7 @@ const shareLinks = {
 
   <dialog
     class="donate-modal share-modal"
-    data-share-modal
+    data-share-modal="support"
     data-share-url={shareUrl}
     data-share-title="PolliStream"
     aria-labelledby="share-modal-title"
@@ -116,69 +108,7 @@ const shareLinks = {
       <h2 class="donate-modal__title" id="share-modal-title">{t.support.shareModalTitle}</h2>
       <p class="donate-modal__lead">{t.support.shareModalBody}</p>
 
-      <div class="share-grid">
-        <a
-          class="share-option"
-          href={shareLinks.whatsapp}
-          target="_blank"
-          rel="noopener"
-          data-share-network="whatsapp"
-        >
-          <span class="share-option__icon"><Icon name="whatsapp" size={18} /></span>
-          {t.support.shareWhatsApp}
-        </a>
-        <a
-          class="share-option"
-          href={shareLinks.telegram}
-          target="_blank"
-          rel="noopener"
-          data-share-network="telegram"
-        >
-          <span class="share-option__icon"><Icon name="telegram" size={18} /></span>
-          {t.support.shareTelegram}
-        </a>
-        <a
-          class="share-option"
-          href={shareLinks.facebook}
-          target="_blank"
-          rel="noopener"
-          data-share-network="facebook"
-        >
-          <span class="share-option__icon"><Icon name="facebook" size={18} /></span>
-          {t.support.shareFacebook}
-        </a>
-        <a
-          class="share-option"
-          href={shareLinks.x}
-          target="_blank"
-          rel="noopener"
-          data-share-network="x"
-        >
-          <span class="share-option__icon"><Icon name="x" size={18} /></span>
-          {t.support.shareX}
-        </a>
-        <a
-          class="share-option"
-          href={shareLinks.email}
-          data-share-network="email"
-        >
-          <span class="share-option__icon"><Icon name="mail" size={18} /></span>
-          {t.support.shareEmail}
-        </a>
-        <button
-          class="share-option"
-          type="button"
-          data-share-copy
-          data-copied-label={t.support.copied}
-        >
-          <span class="share-option__icon"><Icon name="copy" size={18} /></span>
-          <span data-share-copy-label>{t.support.shareCopy}</span>
-        </button>
-        <button class="share-option" type="button" data-share-native hidden>
-          <span class="share-option__icon"><Icon name="share" size={18} /></span>
-          {t.support.shareNative}
-        </button>
-      </div>
+      <ShareOptions locale={locale} />
 
       <div class="donate-modal__actions">
         <button class="btn btn-ghost" type="button" data-share-close>{t.support.shareClose}</button>

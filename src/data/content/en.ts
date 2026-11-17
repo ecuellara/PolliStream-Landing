@@ -244,7 +244,6 @@ export const en: Content = {
     openInstaller: 'Open installer',
     afterDownloadTitle: 'Thanks for downloading PolliStream!',
     afterDownloadBody: 'Would you recommend the player to someone or support its development with a donation?',
-    afterDownloadShare: 'Recommend on WhatsApp',
     tutorialKicker: 'INSTALLATION GUIDE',
     tutorialTitle: 'Install PolliStream on {platform}',
     tutorialBody: 'Follow these steps to install the package and set up your account.',
