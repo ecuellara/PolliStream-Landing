@@ -57,6 +57,7 @@ export async function onRequestGet(context: { env: Env }): Promise<Response> {
   const pageviews: Totals = {}
   const devices: Totals = {}
   const trafficDevices: Totals = {}
+  let shares = 0
 
   if (env.DB) {
     try {
@@ -67,6 +68,10 @@ export async function onRequestGet(context: { env: Env }): Promise<Response> {
       ).all<{ platform: string; event: string; total: number }>()
 
       for (const row of events.results ?? []) {
+        if (row.event === 'share_click' && row.platform !== 'site') {
+          shares += Number(row.total)
+        }
+
         const bucket =
           row.event === 'download_click'
             ? clicks
@@ -122,6 +127,7 @@ export async function onRequestGet(context: { env: Env }): Promise<Response> {
       pageviews,
       devices,
       trafficDevices,
+      shares,
     },
     {
       headers: {

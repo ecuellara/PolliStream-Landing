@@ -242,6 +242,9 @@ export const es: Content = {
     whatsNextBody:
       'Abre el instalador y sigue la guía de tu plataforma. Si tu TV pide un paso de desarrollador, lo tienes explicado en la página del producto.',
     openInstaller: 'Abrir instalador',
+    afterDownloadTitle: '¡Gracias por descargar PolliStream!',
+    afterDownloadBody: '¿Quieres recomendar el reproductor o apoyar su desarrollo con una donación?',
+    afterDownloadShare: 'Recomendar por WhatsApp',
     tutorialKicker: 'GUÍA DE INSTALACIÓN',
     tutorialTitle: 'Instala PolliStream en {platform}',
     tutorialBody: 'Sigue estos pasos para instalar el paquete y preparar tu cuenta.',
@@ -265,6 +268,7 @@ export const es: Content = {
     shareBody: 'Recomienda la app',
     shareModalTitle: 'Compartir PolliStream',
     shareModalBody: 'Elige por dónde quieres compartir la app. También puedes copiar el enlace.',
+    shareCount: 'compartidos',
     shareWhatsApp: 'WhatsApp',
     shareTelegram: 'Telegram',
     shareFacebook: 'Facebook',

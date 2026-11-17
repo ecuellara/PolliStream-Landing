@@ -111,17 +111,21 @@ function initPageView(): void {
 }
 
 async function initDownloadCounters(): Promise<void> {
-  const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-download-count]'))
-  if (nodes.length === 0) return
+  const downloadNodes = Array.from(document.querySelectorAll<HTMLElement>('[data-download-count]'))
+  const shareCount = document.querySelector<HTMLElement>('[data-share-count-value]')
+  if (downloadNodes.length === 0 && !shareCount) return
 
   try {
     const response = await fetch('/api/stats', { headers: { accept: 'application/json' } })
     if (!response.ok) return
-    const data = (await response.json()) as { downloads?: Record<string, number> }
+    const data = (await response.json()) as {
+      downloads?: Record<string, number>
+      shares?: number
+    }
     const downloads = data.downloads ?? {}
     const total = Object.values(downloads).reduce((sum, value) => sum + (Number(value) || 0), 0)
 
-    for (const node of nodes) {
+    for (const node of downloadNodes) {
       const slug = node.dataset.downloadCount ?? ''
       const value = slug === 'all' ? total : Number(downloads[slug] ?? 0)
       if (!value || value <= 0) continue
@@ -129,6 +133,8 @@ async function initDownloadCounters(): Promise<void> {
       if (target) target.textContent = formatCount(value)
       node.hidden = false
     }
+
+    if (shareCount) shareCount.textContent = formatCount(Number(data.shares ?? 0))
   } catch {
     /* Counters are progressive enhancement; the page works without them. */
   }
@@ -248,7 +254,6 @@ function initShare(): void {
   openers.forEach((opener) => {
     opener.addEventListener('click', () => {
       dialog.showModal()
-      track('share_click', { platform: 'site' })
     })
   })
 
@@ -409,10 +414,6 @@ function initDownloadGate(): void {
       event.preventDefault()
       return
     }
-    track('download_click', {
-      product: button.dataset.trackLabel ?? '',
-      mode: button.dataset.downloadMode ?? '',
-    })
   })
 
   const tick = (): void => {
@@ -428,6 +429,43 @@ function initDownloadGate(): void {
   }
 
   window.requestAnimationFrame(tick)
+}
+
+function initPostDownloadPrompt(): void {
+  const dialog = document.querySelector<HTMLDialogElement>('[data-post-download-dialog]')
+  if (!dialog) return
+
+  document.querySelectorAll<HTMLElement>('[data-post-download]').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (link.getAttribute('aria-disabled') === 'true') return
+
+      track('download_click', {
+        product: link.dataset.trackLabel ?? '',
+        mode: link.dataset.downloadMode ?? 'download',
+      })
+      if (!dialog.open) dialog.showModal()
+    })
+  })
+
+  dialog.querySelectorAll<HTMLElement>('[data-post-download-close]').forEach((button) => {
+    button.addEventListener('click', () => dialog.close())
+  })
+
+  dialog.querySelector<HTMLElement>('[data-post-download-share]')?.addEventListener('click', () => {
+    track('share_click', { platform: 'whatsapp', mode: 'download' })
+    dialog.close()
+  })
+
+  dialog
+    .querySelector<HTMLElement>('[data-post-download-donate]')
+    ?.addEventListener('click', () => {
+      track('donate_click', { platform: 'site', mode: 'download' })
+      dialog.close()
+    })
+
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close()
+  })
 }
 
 function loadAdSense(client: string): Promise<void> {
@@ -592,6 +630,7 @@ function init(): void {
   initTrackedLinks()
   initDonationModals()
   initDownloadGate()
+  initPostDownloadPrompt()
   initConsent()
   void initDownloadCounters()
 }

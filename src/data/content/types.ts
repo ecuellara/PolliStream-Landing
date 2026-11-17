@@ -207,6 +207,9 @@ export type Content = {
     whatsNext: string
     whatsNextBody: string
     openInstaller: string
+    afterDownloadTitle: string
+    afterDownloadBody: string
+    afterDownloadShare: string
     tutorialKicker: string
     tutorialTitle: string
     tutorialBody: string
@@ -230,6 +233,7 @@ export type Content = {
     shareBody: string
     shareModalTitle: string
     shareModalBody: string
+    shareCount: string
     shareWhatsApp: string
     shareTelegram: string
     shareFacebook: string

@@ -42,6 +42,10 @@ const shareLinks = {
       <span class="support-card__icon"><Icon name="share" size={22} /></span>
       <h3 class="support-card__title">{t.support.shareTitle}</h3>
       <p class="support-card__body">{t.support.shareBody}</p>
+      <p class="support-card__meta" data-share-count>
+        <strong class="text-lime" data-share-count-value>0</strong>
+        {t.support.shareCount}
+      </p>
       <button
         class="btn btn-secondary btn-sm"
         type="button"
