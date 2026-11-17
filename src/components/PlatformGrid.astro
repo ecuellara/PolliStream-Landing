@@ -21,13 +21,6 @@ const t = getContent(locale)
     </div>
   </header>
 
-  <a class="platform-highlight" href="#installer" data-reveal>
-    <span class="platform-highlight__badge">{t.installer.badge}</span>
-    <Icon name="android" size={15} />
-    <span class="platform-highlight__text">{t.installer.highlight}</span>
-    <Icon name="arrow-right" size={14} class="platform-highlight__arrow" />
-  </a>
-
   <div class="platform-grid">
     {products.map((product, index) => (
       <article class="platform-card" data-accent={product.accent} data-reveal>
@@ -82,70 +75,4 @@ const t = getContent(locale)
     ))}
   </div>
 </section>
-
-<style>
-  .platform-highlight {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 18px;
-    padding: 12px 16px;
-    border: 1px dashed rgba(198, 255, 61, 0.45);
-    border-radius: 999px;
-    background: rgba(198, 255, 61, 0.06);
-    color: var(--color-paper);
-    font-size: 0.84rem;
-    transition:
-      border-color 160ms ease,
-      background 160ms ease;
-  }
-
-  .platform-highlight:hover {
-    border-color: var(--color-lime);
-    background: rgba(198, 255, 61, 0.12);
-  }
-
-  .platform-highlight svg {
-    flex: none;
-    color: var(--color-lime);
-  }
-
-  .platform-highlight__badge {
-    flex: none;
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: var(--color-lime);
-    color: #0a1206;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .platform-highlight__text {
-    flex: 1 1 220px;
-    min-width: 0;
-  }
-
-  .platform-highlight__arrow {
-    margin-left: auto;
-    transition: transform 160ms ease;
-  }
-
-  .platform-highlight:hover .platform-highlight__arrow {
-    transform: translateX(3px);
-  }
-
-  @media (max-width: 620px) {
-    .platform-highlight {
-      border-radius: var(--radius-lg);
-      font-size: 0.8rem;
-    }
-
-    .platform-highlight__arrow {
-      display: none;
-    }
-  }
-</style>
 
